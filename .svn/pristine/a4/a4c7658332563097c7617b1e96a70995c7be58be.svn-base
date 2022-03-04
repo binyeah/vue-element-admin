@@ -1,0 +1,146 @@
+<template>
+    <div class="setEarningsratio">
+        <div class="content bg-f">
+            <div class="top space-between  padding-24">
+                <p class="fs-16">结算比例设置</p>
+                <div class="bg-active color-f save btn" @click="save">保存</div>
+            </div>
+            <div class="tabel padding-24">
+                <div class="list">
+                    <div class="center-col">
+                        <span class="fs-18 color-r">＊</span>
+                        <p>平台：教练</p>
+                        <input type="number" name="" id="" v-model="inptut1" @input="setone">:<input type="number" v-model="inptut2" @input="setthree">(例 3：7)
+                    </div>
+                    <div class="center-col">
+                        <span class="fs-18 color-r">＊</span>
+                        <p>平台：瑜伽馆</p>
+                        <input type="number" name="" id="" v-model="inptut3" @input="settwo">:<input type="number" v-model="inptut4" @input="setfour">(例 3：7)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            id:'',
+            inptut1:0,
+            inptut2:0,
+            inptut3:0,
+            inptut4:0,
+        }
+    },
+    created(){
+        this.getsetratio()
+    },
+    methods:{
+        getsetratio(){
+            const url=this.$host + `admin/service_personnel/get_set_ratio`
+            this.axios.get(url).then(res=>{
+                //console.log(res)
+                var resData = res.data.data
+                this.id=resData.id
+                this.inptut1=resData.plat_coach[0]
+                this.inptut2=resData.plat_coach[1]
+                this.inptut3=resData.plat_yoga[0]
+                this.inptut4=resData.plat_yoga[1]
+                }).catch(error=>{
+                    console.log(error);
+            })
+        },
+        setone(){
+            this.inptut2=10-this.inptut1
+        },
+        settwo(){
+            this.inptut4=10-this.inptut3
+        },
+        setthree(){
+            this.inptut1=10-this.inptut2
+        },
+        setfour(){
+            this.inptut3=10-this.inptut4
+        },
+        save(){
+            if(this.inptut1<0||this.inptut2<0||this.inptut3<0||this.inptut4<0){
+                this.$message.error("数值不能小于0！");
+                return
+            }
+            var data = {
+                id:this.id,
+                plat_coach:[this.inptut1,this.inptut2],
+                plat_yoga:[this.inptut3,this.inptut4]
+            }
+            console.log(data)
+            //return
+            const url=this.$host + `admin/service_personnel/set_ratio`
+            this.axios.post(url,data).then(res=>{
+                  //console.log(res)
+                  var resData=res.data
+                  if(resData.code==1){
+                      this.$message({
+                        message:resData.msg,
+                        type: 'success'
+                    });
+                    this.getsetratio()
+                  }else{
+                       this.$message.error(resData.msg);
+                  }
+                  
+                }).catch(error=>{
+                    console.log(error);
+             })
+        }
+    }
+}
+</script>
+<style lang="scss">
+.setEarningsratio{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            border-bottom: 1px solid #e9e9e9;
+            .save{
+                width: 60px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                border-radius: 5px;
+            }
+            
+        }
+        .tabel{
+            min-height: 500px;
+            padding-bottom: 20px;
+            padding-top: 20px;
+            .list{
+                margin: 50px ;
+                .center-col{
+                    height: 40px;
+                    //background-color: greenyellow;
+                    margin-bottom: 10px;
+                    span{
+                        margin-top: 8px;
+                    }
+                    p{
+                        margin: 0 20px 0 10px;
+                    }
+                    input{
+                        width: 103px;
+                        height: 36px;
+                        line-height: 20px;
+                        text-align: center;
+                        outline: none;
+                        margin: 0 10px;
+                        border: 1px solid rgba(187, 187, 187, 1);
+                    }
+                }
+                
+            }
+        }
+    }
+}
+</style>

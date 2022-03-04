@@ -1,0 +1,164 @@
+<template>
+    <div class="userlist">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <img :src="userinfo.user_portrait" alt="">
+                    <p class="fs-18">{{userinfo.user_nickname}}</p>
+                    <div class="center-col" style="margin-left:20px">
+                        <p>级别：</p>
+                        <el-select v-model="value" placeholder="请选择">
+                            <el-option key="" label="全部" value="">
+                            </el-option>
+                            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+                <div class="right">
+                    <el-input placeholder=" 请输入用户名称" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div>
+            </div>
+            <div class="list">
+                <el-table :data="userlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="80" label="序号">
+                    </el-table-column>
+                    <el-table-column label="头像" width="120">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.user_portrait" alt="" class="header">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="user_nickname" label="名称" width="100">
+                    </el-table-column>
+                    <el-table-column prop="user_sex" label="性别" width="130">
+                    </el-table-column>
+                    <el-table-column prop="user_phone" label="联系电话" width="180">
+                    </el-table-column>
+                    <el-table-column label="区域" >
+                        <template slot-scope="scope">
+                            <p>{{scope.row.user_province}}{{scope.row.user_city}}{{scope.row.user_district}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="消费金额" width="150">
+                        <template slot-scope="scope">
+                            <p>&yen;{{scope.row.consume_money}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="级别" width="120">
+                        <template slot-scope="scope">
+                            <p>LV{{scope.row.user_level}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="订单数" width="100">
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'studentsorder',query:{id:scope.row.user_id}}" class="link">{{scope.row.student_order_number}}</router-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="created_at" label="注册时间" width="100">
+                    </el-table-column>
+                    <el-table-column label="操作" width="120" >
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="ban(scope.row.id)" v-if="scope.row.ban==true">解禁</div>
+                            <div class="btn active" @click="ban(scope.row.id)" v-else>禁用</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            options: [
+                {
+                value: '1',
+                label: '初级'
+                }, 
+                {
+                value: '2',
+                label: '中级'
+                }, 
+                {
+                value: '3',
+                label: '高级'
+                }, 
+                
+            ],
+            userinfo:{},
+            cove:require("../../assets/logo.png"),
+            teachername:'xxx',
+            value: '',
+            id:'',
+            userlist:[],
+        }
+    },
+    created(){
+        this.id=this.$route.query.id
+        this.getteacherstudentslist(1)
+    },
+    methods:{
+        getteacherstudentslist(page){
+            const url = this.$host + `admin/service_personnel/my_team`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    course_instructor_id:this.id,
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.userlist=resData.result
+                    this.total_page=resData.total_number
+                    this.userinfo=resData.user_info
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        ban(i){
+            
+        },
+        serch(){
+
+        },
+        handleCurrentChange(val) {
+           this.getteacherstudentslist(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.userlist{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                img{
+                    width: 48px;
+                    height: 48px;
+                    border-radius:50%;
+                    margin-right: 20px;
+                }
+            }
+            
+        }
+    }
+}
+</style>

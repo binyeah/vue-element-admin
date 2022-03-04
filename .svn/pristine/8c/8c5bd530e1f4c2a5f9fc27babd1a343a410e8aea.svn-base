@@ -1,0 +1,108 @@
+<template>
+    <div class="userinfo">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <el-input placeholder=" 请输入您要搜索的内容" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div>
+                
+            </div>
+            <div class="list">
+                <el-table :data="userlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="50" label="序号">
+                    </el-table-column>
+                    <el-table-column label="头像" width="100">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.img" alt="" class="header">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="name" label="名称" width="100">
+                    </el-table-column>
+                    <el-table-column prop="sex" label="性别" width="50">
+                    </el-table-column>
+                    <el-table-column prop="phone" label="绑定手机号" width="130">
+                    </el-table-column>
+                    <el-table-column prop="idcard" label="身份证" >
+                    </el-table-column>
+                    <el-table-column prop="area" label="区域" width="150">
+                    </el-table-column>
+                    <el-table-column label="消费金额" width="150">
+                        <template slot-scope="scope">
+                            <p>&yen;{{scope.row.money}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="level" label="级别" width="100">
+                    </el-table-column>
+                    <el-table-column prop="time" label="注册时间" width="150">
+                    </el-table-column>
+                    <el-table-column label="操作" width="150" >
+                        <template slot-scope="scope">
+                            <div class="btn active" @click="ban(scope.row.id)">禁用</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            userlist:[
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    sex:'女',
+                    phone:'15545845454',
+                    idcard:'75414356456144',
+                    area:'上海市',
+                    money:'800',
+                    level:'LV1',
+                    time:'2019-06-10',
+                    id:1,
+                }
+            ]
+        }
+    },
+    methods:{
+        serch(){
+
+        },
+        ban(i){
+
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+        },
+    }
+}
+</script>
+<style lang="scss">
+.userinfo{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+            }
+            
+        }
+    }
+}
+</style>

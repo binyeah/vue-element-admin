@@ -1,0 +1,174 @@
+<template>
+    <div class="userinfo">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <el-input placeholder=" 请输入您要搜索的内容" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div>
+                
+            </div>
+            <div class="list">
+                <el-table :data="userlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="50" label="序号">
+                    </el-table-column>
+                    <el-table-column label="头像" width="100">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.user_portrait" alt="" class="header">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="user_nickname" label="名称" width="100">
+                    </el-table-column>
+                    <el-table-column prop="user_sex" label="性别" width="50">
+                    </el-table-column>
+                    <el-table-column prop="user_phone" label="绑定手机号" width="130">
+                    </el-table-column>
+                    <el-table-column label="身份证" >
+                        <template slot-scope="scope">
+                            <img :src="scope.row.identity_card_front||noimg" alt="" class="long" @click="look(scope.row)">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="area" label="区域" width="150">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.user_city}}{{scope.row.user_district}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="消费金额" width="150">
+                        <template slot-scope="scope">
+                            <p>&yen;{{scope.row.user_consume_money}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="user_level" label="级别" width="100">
+                    </el-table-column>
+                    <el-table-column prop="register_time" label="注册时间" width="150">
+                    </el-table-column>
+                    <el-table-column label="操作" width="150" >
+                        <template slot-scope="scope">
+                            <!-- <div class="btn active" @click="ban(scope.row.user_id)">禁用</div> -->
+                            <div class="btn del" @click="ban(scope.row.user_id,2)" v-if="scope.row.is_disable==1">解禁</div>
+                            <div class="btn active" @click="ban(scope.row.user_id,1)" v-else>禁止账号</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+        <div class="addbox">
+            <el-dialog title="用户信息" :visible.sync="addbox">
+                <div class="">
+                    <el-form ref="form" :model="form" label-width="120px">
+                        <el-form-item label="身份证正面：">
+                            <img :src="form.identity_card_front==''?noimg:form.identity_card_front" alt="" class="idcard">
+                        </el-form-item>
+                        <el-form-item label="身份证反面：">
+                            <img :src="form.identity_card_backend==''?noimg:form.identity_card_backend" alt="" class="idcard">
+                        </el-form-item>
+                    </el-form>
+                </div>
+                
+            </el-dialog>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            addbox:false,
+            input:'',
+            total_page:1,
+            userlist:[],
+            noimg:require("../../assets/timg.jpg"),
+            form:{}
+        }
+    },
+    created(){
+        this.getuserlist(1)
+    },
+    methods:{
+        getuserlist(page){
+            const url = this.$host + `admin/user`;
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    keyword:this.input,
+                }
+              }).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.userlist=resData.data.result
+                    this.total_page=resData.data.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        serch(){
+            this.getuserlist(1)
+        },
+        look(item){
+            this.addbox=true
+            this.form=item
+        },
+        ban(id,i){
+            var data = {
+                user_id:id,
+                mtype:i,
+            }
+            const url=this.$host + `admin/service_personnel/forbid_account`
+            this.axios.post(url,data).then(res=>{
+                  //console.log(res)
+                  var resData=res.data
+                  if(resData.code==1){
+                      this.$message({
+                        message:resData.msg,
+                        type: 'success'
+                    });
+                  }
+                  this.getuserlist(1)
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+            this.getuserlist(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.userinfo{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+            }
+            
+        }
+        .list{
+            .long{
+                cursor: pointer;
+            }
+        }
+    }
+    .idcard{
+        width: 200px;
+        height: 150px;
+    }
+}
+</style>

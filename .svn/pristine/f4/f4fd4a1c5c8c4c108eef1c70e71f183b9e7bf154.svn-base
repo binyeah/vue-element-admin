@@ -1,0 +1,196 @@
+<template>
+    <div class="settime">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <p class="fs-16">设置时间</p>
+                <div class="add btn color-f bg-active" @click="add">添加</div>
+            </div>
+            <div class="list">
+                <el-table :data="timelist" ref="multipleTable" stripe border style="width: 100%" >
+                    
+                    <el-table-column label="开始时间" >
+                        <template slot-scope="scope">
+                            <input type="text" v-model="scope.row.start_date" @change="edit(scope.row)">
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="结束时间" >
+                        <template slot-scope="scope">
+                            <input type="text" v-model="scope.row.end_date" @change="edit(scope.row)">
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" >
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="del(scope.row.id)">删除</div>
+                           
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <div class="addbox">
+                <el-dialog title="添加时间" :visible.sync="addbox">
+                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+                        <el-form-item label="开始时间：" prop="startime">
+                            <el-input v-model="ruleForm.startime" style="width:400px" placeholder="请输入开始时间"></el-input>
+                        </el-form-item>
+                        <el-form-item label="结束时间：" prop="endtime">
+                            <el-input v-model="ruleForm.endtime" style="width:400px" placeholder="请输入结束时间"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                    <el-button @click="addbox = false">取 消</el-button>
+                    <el-button type="primary" @click="sure()">确 定</el-button>
+                    </div>
+                </el-dialog>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            addbox:false,
+            timelist:[],
+            ruleForm:{
+                startime:'',
+                endtime:'',
+            },
+            rules: {
+                startime: [
+                    { required: true, message: '请输入开始时间', trigger: 'blur' },
+                ],
+                endtime: [
+                    { required: true, message: '请输入结束时间', trigger: 'blur' },
+                ],
+            }
+        }
+    },
+    created(){
+        this.gettimelist(1)
+    },
+    methods:{
+        gettimelist(page){
+            const url = this.$host + `/www/yoga/admin/course_class_hour`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:20,
+                    page:page,
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.timelist=resData.result
+                    //this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        del(i){
+            var data={
+                class_hour_id:i
+            }
+            //console.log(data)
+            const url = this.$host + `/www/yoga/admin/course_class_hour/delete_class_hour`;
+            //console.log(url)
+            this.axios.post(url,data).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    if(resData.code==1){
+                        this.$message({
+                        message: '删除成功',
+                        type: 'success'
+                    });
+                    this.gettimelist(1)
+                    //this.addbox=false;
+                    }
+                    
+                    //this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        add(){
+            
+            const url = this.$host + `/www/yoga/admin/course_class_hour/add_class_hour`;
+            //console.log(url)
+            this.axios.post(url).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    
+                        this.$message({
+                        message: '添加成功',
+                        type: 'success'
+                    });
+                    this.gettimelist(1)
+                    //this.addbox=false;
+                   
+                    
+                    //this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+            
+        },
+        edit(item){
+           var data={
+                class_hour_id:item.id,
+                start_date:item.start_date,
+                end_date:item.end_date
+            }
+            //console.log(data)
+            const url = this.$host + `/www/yoga/admin/course_class_hour/edit_class_hour`;
+            //console.log(url)
+            this.axios.post(url,data).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    if(resData.code==1){
+                        this.$message({
+                        message: '编辑成功',
+                        type: 'success'
+                    });
+                    this.gettimelist(1)
+                    //this.addbox=false;
+                    }
+                    
+                    //this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            }) 
+        }
+    }
+}
+</script>
+<style lang="scss">
+.settime{
+    .content{
+        height: auto;
+        padding-bottom: 20px;
+        .top{
+            height: 80px;
+            .add{
+                
+                width: 87px;
+                height: 30px;
+                line-height: 30px;
+                border-radius: 6px;
+                
+                text-align: center;
+            }
+        }
+        .list{
+            input{
+                text-align: center
+            }
+        }
+    }
+}
+</style>

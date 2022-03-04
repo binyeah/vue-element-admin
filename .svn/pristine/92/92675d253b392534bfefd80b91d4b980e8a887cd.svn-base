@@ -1,0 +1,89 @@
+<template>
+    <div class="setEarningsratio">
+        <div class="content bg-f">
+            <div class="top space-between  padding-24">
+                <p class="fs-16">结算比例设置</p>
+                <div class="bg-active color-f save btn" @click="save">保存</div>
+            </div>
+            <div class="tabel padding-24">
+                <div class="list">
+                    <div class="center-col">
+                        <span class="fs-18 color-r">＊</span>
+                        <p>平台：教练</p>
+                        <input type="text" name="" id="" v-model="inptut1">:<input type="text" v-model="inptut2">
+                    </div>
+                    <div class="center-col">
+                        <span class="fs-18 color-r">＊</span>
+                        <p>平台：瑜伽馆</p>
+                        <input type="text" name="" id="" v-model="inptut3">:<input type="text" v-model="inptut4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            inptut1:'',
+            inptut2:'',
+            inptut3:'',
+            inptut4:'',
+        }
+    },
+    methods:{
+        save(){
+
+        }
+    }
+}
+</script>
+<style lang="scss">
+.setEarningsratio{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            border-bottom: 1px solid #e9e9e9;
+            .save{
+                width: 60px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                border-radius: 5px;
+            }
+            
+        }
+        .tabel{
+            min-height: 500px;
+            padding-bottom: 20px;
+            padding-top: 20px;
+            .list{
+                margin: 50px ;
+                .center-col{
+                    height: 40px;
+                    //background-color: greenyellow;
+                    margin-bottom: 10px;
+                    span{
+                        margin-top: 8px;
+                    }
+                    p{
+                        margin: 0 20px 0 10px;
+                    }
+                    input{
+                        width: 103px;
+                        height: 36px;
+                        line-height: 20px;
+                        text-align: center;
+                        outline: none;
+                        margin: 0 10px;
+                        border: 1px solid rgba(187, 187, 187, 1);
+                    }
+                }
+                
+            }
+        }
+    }
+}
+</style>

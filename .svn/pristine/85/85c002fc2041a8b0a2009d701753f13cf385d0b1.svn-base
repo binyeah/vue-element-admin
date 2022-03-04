@@ -1,0 +1,170 @@
+<template>
+    <div class="userlist">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <img :src="cove" alt="">
+                    <p class="fs-18">{{teachername}}</p>
+                    <div class="center-col" style="margin-left:20px">
+                        <p>级别：</p>
+                        <el-select v-model="value" placeholder="请选择">
+                            <el-option key="" label="全部" value="">
+                            </el-option>
+                            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+                <div class="right">
+                    <el-input placeholder=" 请输入用户名称" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div>
+            </div>
+            <div class="list">
+                <el-table :data="userlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="80" label="序号">
+                    </el-table-column>
+                    <el-table-column label="头像" width="120">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.img" alt="" class="header">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="name" label="名称" width="100">
+                    </el-table-column>
+                    <el-table-column prop="sex" label="性别" width="130">
+                    </el-table-column>
+                    <el-table-column prop="phone" label="联系电话" width="180">
+                    </el-table-column>
+                    
+                    <el-table-column prop="area" label="区域" >
+                    </el-table-column>
+                    
+                    <el-table-column label="消费金额" width="150">
+                        <template slot-scope="scope">
+                            <p>&yen;{{scope.row.money}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="level" label="级别" width="120">
+                    </el-table-column>
+                    <el-table-column label="订单数" width="100">
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'',query:{id:scope.row.id}}" class="link">{{scope.row.order}}</router-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="time" label="注册时间" width="100">
+                    </el-table-column>
+                    <el-table-column label="操作" width="120" >
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="ban(scope.row.id)" v-if="scope.row.ban==true">解禁</div>
+                            <div class="btn active" @click="ban(scope.row.id)" v-else>禁用</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            options: [
+                {
+                value: '1',
+                label: '初级'
+                }, 
+                {
+                value: '2',
+                label: '中级'
+                }, 
+                {
+                value: '3',
+                label: '高级'
+                }, 
+                
+            ],
+            cove:require("../../assets/logo.png"),
+            teachername:'xxx',
+            value: '',
+            id:'',
+            userlist:[
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    phone:'15545845454',
+                    area:'上海市',
+                    id:1,
+                    sex:'女',
+                    money:500,
+                    order:50,
+                    score:'90%',
+                    level:'Lv1',
+                    time:'2019-06-10',
+                    ban:true
+                },
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    phone:'15545845454',
+                    area:'上海市',
+                    id:1,
+                    sex:'女',
+                    money:500,
+                    order:50,
+                    score:'90%',
+                    level:'Lv2',
+                    time:'2019-06-10',
+                    ban:false
+                }
+            ],
+        }
+    },
+    created(){
+        this.id=this.$route.query.id
+    },
+    methods:{
+        ban(i){
+            
+        },
+        serch(){
+
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+        },
+    }
+}
+</script>
+<style lang="scss">
+.userlist{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                img{
+                    width: 48px;
+                    height: 48px;
+                    border-radius:50%;
+                    margin-right: 20px;
+                }
+            }
+            
+        }
+    }
+}
+</style>

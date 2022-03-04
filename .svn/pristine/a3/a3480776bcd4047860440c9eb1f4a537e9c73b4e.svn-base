@@ -1,0 +1,236 @@
+<template>
+    <div class="teacher">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <el-input placeholder=" 请输入您要搜索的内容" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+
+                    <div class="center-col" style="margin-left:20px">
+                        <p>服务类型：</p>
+                        <el-select v-model="value" placeholder="请选择" @change="choose">
+                            <el-option key="" label="全部" value="">
+                            </el-option>
+                            <el-option v-for="item in options" :key="item.id" :label="item.cate_name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="list">
+                <el-table :data="teacherlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="50" label="序号">
+                    </el-table-column>
+                    <el-table-column label="头像" width="80">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.user_portrait" alt="" class="header">
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="名称" width="100">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.user_real_name||scope.row.user_nickname}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="user_phone" label="联系电话" width="130">
+                    </el-table-column>
+                    <el-table-column label="服务类型" width="150">
+                        <template slot-scope="scope">
+                            <span v-for="(item,index) in scope.row.service_type" :key="index">{{item}};</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="服务地区" >
+                        <template slot-scope="scope">
+                            <span v-for="(item,index) in scope.row.user_service_region" :key="index" >{{item}};</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="学员" width="50">
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'userlist',query:{id:scope.row.user_id}}" class="link">{{scope.row.student_number}}</router-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="订单数" width="80">
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'selforder',query:{id:scope.row.user_id}}" class="link">{{scope.row.order_number}}</router-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="发布的课程数"  width="120">
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'selfcoure',query:{id:scope.row.user_id}}" class="link">{{scope.row.course_number}}</router-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="order_amount" label="订单金额" width="100">
+                    </el-table-column>
+                    <el-table-column label="状态" width="100">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.order_status==0?'未知':(scope.row.order_status==1?'接单中':'暂停接单')}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="好评率" width="80">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.good_rate}}%</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="级别" width="100">
+                        <template slot-scope="scope">
+                            <!-- <input type="text" v-model="scope.row.level" class="sort" style="width:50px"> -->
+                            <el-select v-model="scope.row.coach_level" placeholder="请选择" @change="chooselevel(scope.row)">
+                                <el-option v-for="item in level" :key="item.value" :label="item.label" :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="120" >
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="ban(scope.row.user_id,2)" v-if="scope.row.is_disable==1">解禁</div>
+                            <div class="btn active" @click="ban(scope.row.user_id,1)" v-else>禁止账号</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            options: [],
+            value: '',
+            teacherlist:[],
+            level:[
+                {
+                    value:'0',
+                    label:'未知'
+                },
+                {
+                    value:'1',
+                    label:'LV1'
+                },
+                {
+                    value:'2',
+                    label:'LV2'
+                },
+                {
+                    value:'3',
+                    label:'LV3'
+                }
+            ]
+        }
+    },
+    created(){
+        this.getteacherlist(1)
+        this.gettypes()
+    },
+    methods:{
+        gettypes(){
+           const url = this.$host + `admin/cate/second_cate`;
+            //console.log(url)
+            this.axios.get(url).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.options=resData.goods_cate
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            }) 
+        },
+        getteacherlist(page){
+            const url = this.$host + `admin/service_personnel/coach_manage`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    keyword:this.input,
+                    sid:this.value,
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    // this.$message({
+                    //     message: '恭喜你，这是一条成功消息',
+                    //     type: 'success'
+                    // });
+                    this.teacherlist=resData.result
+                    this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        choose(){
+            this.getteacherlist(1)
+        },
+        ban(id,i){
+            var data = {
+                user_id:id,
+                mtype:i,
+            }
+            const url=this.$host + `admin/service_personnel/forbid_account`
+            this.axios.post(url,data).then(res=>{
+                  console.log(res)
+                  var resData=res.data
+                  if(resData.code==1){
+                      this.$message({
+                        message:resData.msg,
+                        type: 'success'
+                    });
+                  }
+                  this.getteacherlist(1)
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        chooselevel(i){
+            console.log(i)
+            var data = {
+                user_id:i.user_id,
+                coach_level:i.coach_level,
+            }
+            const url=this.$host + `admin/set_coach_level`
+            this.axios.post(url,data).then(res=>{
+                  console.log(res)
+                  var resData=res.data
+                  if(resData.code==1){
+                      this.$message({
+                        message:resData.msg,
+                        type: 'success'
+                    });
+                  }
+                  this.getteacherlist(1)
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        serch(){
+            this.getteacherlist(1)
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+            this.getteacherlist(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.teacher{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+        }
+    }
+}
+</style>

@@ -1,0 +1,201 @@
+<template>
+    <div class="city">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">城市管理</div>
+                <div class="add btn color-f bg-active" @click="add">添加</div>
+            </div>
+            <div class="list">
+                <el-table :data="cityList" stripe border style="width: 100%">
+                    <el-table-column type="index" width="100" label="序号">
+                    </el-table-column>
+                    <el-table-column label="城市名" >
+                        <template slot-scope="scope">
+                            <!-- <p>{{scope.row}}</p> -->
+                            <input type="text" v-model="scope.row.city_name" class="sort" @change="change(scope.row,1)">
+                            <!-- <img :src="scope.row.slide_cover" alt="" class="long"> -->
+                        </template>
+                    </el-table-column>
+                    
+                    <el-table-column label="排序">
+                        <template slot-scope="scope">
+                            <input type="text" v-model="scope.row.sort" class="sort" @change="change(scope.row,2)">
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="del(scope.row.id)">删除</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            cityList:[],
+            total_page:1,
+        }
+    },
+    created(){
+        this.getCitylist(1)
+    },
+    methods:{
+        getCitylist(page){
+            const url = this.$host + `/www/yoga/admin/city`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    // this.$message({
+                    //     message: '恭喜你，这是一条成功消息',
+                    //     type: 'success'
+                    // });
+                    this.cityList=resData.result
+                    this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        add(){
+            const url=this.$host + `/www/yoga/admin/city/add_city`;
+            this.axios.post(url).then(res=>{
+                //console.log(res.data)
+                this.$message({
+                        message: '添加成功！',
+                        type: 'success'
+                    });
+                this.getCitylist(1)
+            }).catch(error=>{
+                console.log(error);
+            })
+        },
+        del(i){
+            var data={
+                city_id:i
+            }
+            const url = this.$host + `/www/yoga/admin/city/delete_city`;
+            //console.log(url)
+            this.axios.post(url,data).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    console.log(res)
+                    let resData = res.data;
+                    if(resData.code==1){
+                        this.$message({
+                            message: resData.msg,
+                            type: 'success'
+                        });
+                        this.getCitylist(1)
+                        this.cityList=resData.result
+                        this.total_page=resData.total_number
+                    }else{
+                        this.$message({
+                            message: resData.msg,
+                            type: 'success'
+                        });
+                    }
+                    
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        change(item,i){
+            var data=''
+            if(i==1){
+                data=item.city_name
+            }else{
+                data=item.sort
+            }
+            var data1={
+                city_id:item.id,
+                mtype:i,
+                val:data
+            }
+            const url = this.$host + `/www/yoga/admin/city/edit_city`;
+            //console.log(url)
+            this.axios.post(url,data1).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    console.log(res)
+                    let resData = res.data;
+                    if(resData.code==1){
+                        this.$message({
+                            message: resData.msg,
+                            type: 'success'
+                        });
+                        this.getCitylist(1)
+                        this.cityList=resData.result
+                        this.total_page=resData.total_number
+                    }else{
+                        this.$message({
+                            message: resData.msg,
+                            type: 'success'
+                        });
+                    }
+                    
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+            this.getCitylist(val)
+        },
+        
+    }
+}
+</script>
+<style lang="scss">
+.city{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                span{
+                    font-size: 14px;
+                    color: #E51C23;
+
+                }
+            }
+            .add{
+                
+                width: 87px;
+                height: 30px;
+                line-height: 30px;
+                border-radius: 6px;
+                
+                text-align: center;
+            }
+        }
+        .sort{
+            text-align: center
+        }
+    }
+}
+</style>

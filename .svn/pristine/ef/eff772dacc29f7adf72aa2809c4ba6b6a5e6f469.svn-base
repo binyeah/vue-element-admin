@@ -1,0 +1,206 @@
+<template>
+    <div class="addacount">
+        <div class="content bg-f">
+            <div class="top space-between  padding-24">
+                <p class="fs-16">编辑信息</p>
+                <div class="bg-active color-f save btn" @click="save">保存</div>
+            </div>
+            <div class="tabel padding-24">
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" class="demo-ruleForm">
+                    <el-form-item label="账号：" prop="account" >
+                        <el-input v-model="ruleForm.account" style="width:400px"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码：" prop="password">
+                        <el-input v-model="ruleForm.password" style="width:400px"></el-input>
+                    </el-form-item>
+                    <el-form-item label="权限：">
+                        <div class="tree">
+                            <el-tree
+                            :data="right"
+                            show-checkbox
+                            node-key="mod_id"
+                            ref="tree"
+                            default-expand-all
+                            highlight-current
+                            :props="defaultProps"
+                            
+                            >
+                            </el-tree>
+                        </div>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+import { setTimeout } from 'timers';
+export default {
+    data(){
+        return{
+            auths:[],
+            id:'',
+            ruleForm:{
+                account:'',
+                password:'',
+                
+            },
+            right:[],
+            defaultProps: {
+                children: 'children',
+                label: 'label'
+            },
+            rules: {
+                account: [
+                    { required: true, message: '请输入账号', trigger: 'blur' },
+                ],
+                password: [
+                    { required: true, message: '请输入密码', trigger: 'blur' },
+                ],
+               
+            }
+        }
+    },
+    created(){
+        this.id=this.$route.query.id
+        this.getright()
+        this.editAccounts(this.id)
+    },
+    mounted(){
+        this.setCheckedKeys()
+    },
+    methods:{
+        save(){
+            var arr=this.$refs.tree.getCheckedKeys()
+            for(var i=0;i<arr.length;i++){
+                arr[i]=Number(arr[i])
+            }
+            //console.log(arr)
+            if(!this.ruleForm.account){
+                this.$message.error('账号不能为空！');
+                return
+            }
+            if(!this.ruleForm.password){
+                this.$message.error('密码不能为空！');
+                return
+            }
+            if(!arr[0]){
+                this.$message.error('权限不能为空！');
+                return
+            }
+            const url= this.$host + `admin/save_admin`
+            var data={
+                'id':this.id,
+                'admin_account': this.ruleForm.account,
+                'admin_password':this.ruleForm.password,
+                'auths':arr,
+            }
+            //console.log(data)
+            this.axios.post(url,data).then(res=>{
+                //console.log(res)
+                if(res.status==200){
+                    if(res.data.code==1){
+                        this.$message({
+                        message: '保存成功！',
+                        type: 'success'
+                        });
+                        setTimeout(()=>{
+                            this.$router.push('/accountlist')
+                        },500)
+                        
+                       
+                    }else{
+                        this.$message({
+                            message: res.data.msg,
+                            type: 'warning'
+                        });
+                    }
+                }
+                
+              //console.log(res)
+                }).catch(error=>{
+                    console.log(error);
+             })
+            //this.$router.push( '/accountlist')
+        },
+        getright(){
+            const url=this.$host + `admin/get_modular`
+           
+            this.axios.get(url).then(res=>{
+                  //console.log(res.data)
+                 this.right=res.data
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        // 编辑账号
+        editAccounts(id){
+            const url=this.$host + `admin/edit_admin?id=${id}`
+                this.axios.get(url).then(res=>{
+                //console.log(res)
+                if(res.status==200){
+                    var data=res.data
+                    if(data.auths){
+                        this.ruleForm.account=data.admin_account
+                        this.ruleForm.password=data.admin_password
+                        this.auths=data.auths
+                        for(var i=0;i<this.auths.length;i++){
+                            this.auths[i]=Number(this.auths[i].auth_mod_id)
+                        }
+                        //console.log(this.auths)
+                        this.setCheckedKeys()
+                    }
+                }else{
+                    this.$message({
+                        message: '网络错误！',
+                        type: 'warning'
+                    });
+                }
+                
+                }).catch(error=>{
+                    this.$message({
+                        message: '网络错误！',
+                        type: 'warning'
+                    });
+                    console.log(error);
+                })
+        },
+        setCheckedKeys() {
+            var arr=this.auths
+            this.$refs.tree.setCheckedKeys(arr);
+        },
+    }
+}
+</script>
+<style lang="scss">
+.addacount{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            border-bottom: 1px solid #e9e9e9;
+            .save{
+                width: 60px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                border-radius: 5px;
+            }
+            
+        }
+        .tabel{
+            padding-bottom: 20px;
+            padding-top: 20px;
+            .tree{
+                .el-tree{
+                    display: flex;
+                    flex-wrap: wrap;
+                    .el-tree-node {
+                        width: 200px;
+                    }
+                }
+            }
+        }
+    }
+}
+</style>

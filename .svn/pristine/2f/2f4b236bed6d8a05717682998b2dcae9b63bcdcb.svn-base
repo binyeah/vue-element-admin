@@ -1,0 +1,738 @@
+<template>
+    <div class="addcoure">
+        <div class="content bg-f">
+            <div class="top space-between padding-24">
+                <p>编辑课程</p>
+                <div class="btn save bg-active color-f" @click="save()">保存</div>
+            </div>
+            <div class="mine padding-24">
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+                    <el-form-item label="课程名称：" prop="name">
+                        <el-input v-model="ruleForm.name" style="width:400px" placeholder="请输入课程名称"></el-input><span style="margin-left:10px">{{ruleForm.name.length}}/20</span>
+                    </el-form-item>
+                    <el-form-item label="类型：" prop="typetwo">
+                        <div class="types">
+                            <p>{{types[0].cate_name}}:</p>
+                            <div v-for="(item,index) in types[0].son" :key="index">
+                                <span @click="choosetype(1,index,item)" :class="{ active:checkedtypes.indexOf(item.id)!=-1}">{{item.cate_name}}</span>
+                            </div>
+                        </div>
+                        <div class="types">
+                            <p>{{types[1].cate_name}}:</p>
+                            <div v-for="(item,index) in types[1].son" :key="index">
+                                <span @click="choosetype(2,index,item)" :class="{ active:checkedtypes.indexOf(item.id)!=-1}">{{item.cate_name}}</span>
+                            </div>
+                        </div>
+                        <div class="types">
+                            <p>{{types[2].cate_name}}:</p>
+                            <div v-for="(item,index) in types[2].son" :key="index">
+                                <span @click="choosetype(3,index,item)" :class="{ active:checkedtypes.indexOf(item.id)!=-1}">{{item.cate_name}}</span>
+                            </div>
+                        </div>
+                        <!-- <el-select v-model="ruleForm.typeone" placeholder="请选择" @change="chooseStype(2)">
+                            <el-option v-for="item in ptype" :key="item.id" :label="item.cate_name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                        <el-select v-model="ruleForm.typetwo" placeholder="请选择">
+                            <el-option v-for="item in Stype" :key="item.id" :label="item.cate_name" :value="item.id">
+                            </el-option>
+                        </el-select> -->
+                    </el-form-item>
+                    <el-form-item label="教练：" prop="teacher">
+                        <el-autocomplete
+                            v-model="ruleForm.teacher"
+                            :fetch-suggestions="querySearchAsync"
+                            placeholder="请选择教练"
+                            @select="handleSelect"
+                          ></el-autocomplete>
+                    </el-form-item>
+                    <el-form-item label="课时：" prop="courenum">
+                        <el-select v-model="ruleForm.courenum" placeholder="请选择">
+                            <el-option v-for="item in courenum" :key="item.id" :label="item.course_number" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="难度：" prop="differ">
+                        <el-select v-model="ruleForm.differ" placeholder="请选择">
+                            <el-option v-for="item in differ" :key="item.id" :label="item.course_level" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <div class="flex">
+                        <el-form-item label="单价：" prop="singleP">
+                            <el-input v-model="ruleForm.singleP" style="width:215px" placeholder="请输入单价"></el-input><span style="margin-left:10px">元</span>
+                        </el-form-item>
+                        <el-form-item label="总价：" prop="totalP">
+                            <el-input v-model="ruleForm.totalP" style="width:215px" placeholder="请输入总价"></el-input><span style="margin-left:10px">元</span>
+                        </el-form-item>
+                    </div>
+                    <el-form-item label="课程有效期：" required>
+                        <el-col :span="5">
+                        <el-form-item>
+                            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1" value-format="yyyy-MM-dd" style="width: 200px;"></el-date-picker>
+                        </el-form-item>
+                        </el-col>
+                        <el-col class="line" :span="1">-</el-col>
+                        <el-col :span="5">
+                        <el-form-item>
+                            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2" value-format="yyyy-MM-dd" style="width: 200px;"></el-date-picker>
+                        </el-form-item>
+                        </el-col>
+                    </el-form-item>
+                    <el-form-item label="设置优惠券：">
+                        <el-input v-model="ruleForm.coupon" style="width:215px" placeholder="请输入优惠券金额"></el-input><span style="margin-left:10px">元</span>
+                    </el-form-item>
+                    <el-form-item label="优惠券有效期：">
+                        <el-col :span="5">
+                        <el-form-item >
+                            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date3" value-format="yyyy-MM-dd" style="width: 200px;"></el-date-picker>
+                        </el-form-item>
+                        </el-col>
+                        <el-col class="line" :span="1">-</el-col>
+                        <el-col :span="5">
+                        <el-form-item >
+                            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date4" value-format="yyyy-MM-dd" style="width: 200px;"></el-date-picker>
+                        </el-form-item>
+                        </el-col>
+                    </el-form-item>
+                    <div class="flex">
+                        <el-form-item label="服务地址：" prop="qu">
+                            <el-select v-model="ruleForm.sheng" @change="choseProvince" placeholder="请选择省" style="width:150px" >
+                                <el-option  v-for="item in province" :key="item.id" :label="item.value" :value="item.value">
+                                </el-option>
+                            </el-select>
+                            <el-select v-model="ruleForm.shi" @change="choseCity" placeholder="请选择市" style="width:150px">
+                                <el-option v-for="item in shi1" :key="item.id" :label="item.value" :value="item.value">
+                                </el-option>
+                            </el-select>
+                            <el-select v-model="ruleForm.qu" @change="choseBlock" placeholder="请选择区" style="width:150px">
+                                <el-option v-for="item in qu1" :key="item.id" :label="item.value" :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <div class="add bg-active color-f" @click="add">添加</div>
+                    </div>
+                    <div class="citylist">
+                        <p>已选城市：</p>
+                        <ul>
+                            <li v-for="(item,index) in citys" :key="index" class="space-between">
+                                <p>{{item[0]+item[1]+item[2]}}</p>
+                                <p class="color-active btn" @click="delcity(index)">删除</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <el-form-item label="详情头部" prop="img">
+                        <el-upload
+                        class="upload-demo" 
+                        action="https://test.izhixiu.cn/www/yoga/upload_video"
+                        :show-file-list="false" 
+                        :on-success="handleVideoSuccess" 
+                        >
+                        <el-button size="small" type="primary" style="position:absolute;left:10px;margin-top:-20px">上传视频</el-button>
+                        </el-upload> 
+                        <div  v-if="ruleForm.videoUrl!=''" style="margin-top:20px" class="videoBox">
+                            <span v-if="ruleForm.videoUrl!=''" v-on:click.stop.prevent="delvideo()"><i class="el-icon-circle-close"></i></span>
+                            <video  v-if="ruleForm.videoUrl!=''" :src="ruleForm.videoUrl" style="width:250px;height:120px" controls></video>
+                        </div>
+                        <el-upload
+                        class="upload-demo"
+                        action="https://test.izhixiu.cn/www/yoga/upload_file"
+                        :on-success="handlePreview"
+                        list-type="picture"
+                        :show-file-list="false"
+                        :multiple='multiple'
+                        >
+                        
+                        <el-button size="small" type="primary" style="position:absolute;left:10px;margin-top:-20px">上传图片</el-button>
+                        <div  style="position:absolute;left:100px;margin-top:-20px">（注：建议尺寸750 *584px）</div>
+                        
+                        </el-upload> 
+                        <div v-if="ruleForm.imageUrl1.img!=''" class="imgBox" style="margin-top:30px">
+                            <ul>
+                            <li v-for="(item,index) in ruleForm.imageUrl1" :key="index">
+                                <span v-on:click.stop.prevent="del(index)"><i class="el-icon-circle-close"></i></span>
+                                <img :src="item" style="width:100px;height:100px" />
+                            </li>
+                            </ul>
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="课程介绍：">
+                        <editor :value="ueditor.value" :config="ueditor.config" ref="ue"></editor>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    
+    data(){
+        return{
+            id:'',
+            multiple:true,
+            coureInfo:{},
+            ueditor: {
+                value: '',
+                config: {
+                    
+                }
+            },
+            restaurants: [],
+            typeid:[{value:''}],
+            state: '',
+            timeout:  null,
+            selectedtype:[],
+            types:[{cate_name:''},{cate_name:''},{cate_name:''}],
+            isChange:-1,
+            isChange1:-1,
+            isChange2:-1,
+            //mapJson:'../../../static/css/map.json',
+            mapJson:{},
+            province:'',
+            shi1: [],
+            qu1: [],
+            city:'',
+            block:'',
+            citys:[],
+            ptype:[],
+            Stype:[],
+            differ:[],
+            courenum:[],
+            ruleForm: {
+                name: '',
+                typeone:'',
+                typetwo:'',
+                courenum:'',
+                singleP:'',
+                totalP:'',
+                date1: '',
+                date2: '',
+                date3: '',
+                date4: '',
+                coupon:'',
+                sheng: '',
+                shi: '',
+                qu: '',
+                differ:'',
+                videoUrl:'',
+                imageUrl1:[],
+                teacher:''
+            },
+            rules: {
+                name: [
+                    { required: true, message: '请输入课程名称', trigger: 'blur' },
+                    { max: 20, message: '不超过20个字符', trigger: 'blur' }
+                ],
+                teacher: [
+                    { required: true, message: '请选择教练', trigger: 'change' }
+                ],
+                typetwo: [
+                    { required: true, message: '请选择课程类型', trigger: 'change' }
+                ],
+                courenum:[
+                    { required: true, message: '请选择课时', trigger: 'change' },
+                ],
+                differ:[
+                    { required: true, message: '请选择课程难度', trigger: 'change' },
+                ],
+                singleP:[
+                    { required: true, message: '请输入单价', trigger: 'blur' },
+                ],
+                totalP:[
+                    { required: true, message: '请输入总价', trigger: 'blur' },
+                ],
+                qu:[
+                    { required: true, message: '请选择服务地区', trigger: 'change' }
+                ],
+                img:[
+                    { required: true, message: '请上传详情图片', trigger: 'blur' }
+                ]
+            },
+            ty1:{},
+            ty2:{},
+            ty3:{},
+            checkedtypes:[],
+            teacherid:''
+        }
+    },
+    created(){
+        //this.getmapjson()
+        this.getCityData()
+        this.id=this.$route.query.id
+        this.getcoureinfo()
+        this.gettypes()
+        
+    },
+    mounted() {
+
+    },
+    methods:{
+        getmapjson(){
+            const url = `../../../static/css/map.json`;
+            this.axios.get(url).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    //resData=JSON.stringify(resData)
+                    this.mapJson=resData
+                    
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        getcoureinfo(){
+            const url = this.$host + `admin/course/add_course`;
+            this.axios.get(url,{
+               params:{
+                    course_id:this.id,
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.ptype=resData.pcates
+                    this.courenum=resData.class_hour
+                    this.differ=resData.class_levels
+                    this.coureInfo=resData.course
+                    this.typeid=resData.users
+                    for(var i=0;i<this.typeid.length;i++){
+                        this.typeid[i].value=this.typeid[i].user_nickname
+                    }
+                    this.restaurants = this.loadAll();
+                    if(this.coureInfo!=null){
+                        this.selectedtype=this.coureInfo.course_type
+                        this.dataset()
+                        this.ruleForm.name= this.coureInfo.course_name,
+                        this.ruleForm.typeone=this.coureInfo.pid,
+                        this.teacherid=this.coureInfo.user_id
+                        this.ruleForm.teacher=this.coureInfo.coach_name
+                        this.ruleForm.courenum=this.coureInfo.class_id,
+                        this.ruleForm.singleP=this.coureInfo.unit_price,
+                        this.ruleForm.totalP=this.coureInfo.total_price,
+                        this.ruleForm.date1= this.coureInfo.course_start_time,
+                        this.ruleForm.date2= this.coureInfo.course_end_time,
+                        this.ruleForm.date3=this.coureInfo.coupon_start_time,
+                        this.ruleForm.date4= this.coureInfo.coupon_end_time,
+                        this.ruleForm.coupon=this.coureInfo.coupon_amount,
+                        this.ruleForm.differ=this.coureInfo.course_level,
+                        this.ruleForm.videoUrl=this.coureInfo.course_video,
+                        this.ruleForm.imageUrl1=this.coureInfo.course_cover,
+                        this.citys=this.coureInfo.service_region
+                        this.ueditor.value=this.coureInfo.description
+                        //this.chooseStype(1)
+                    }
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        // 获取分类
+        gettypes(){
+            const url=this.$host + `home/get_cate`
+            this.axios.get(url).then(res=>{
+                  //console.log(res.data.result)
+                  this.types=res.data.result
+                 //this.right=res.data
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        chooseStype(i){
+            //console.log(i)
+            var data={
+                pid:this.ruleForm.typeone,
+            }
+            const url = this.$host + `admin/cate/show_child`;
+            //console.log(url)
+            this.axios.post(url,data).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.Stype=resData.result
+                    if(this.Stype.length!=0){
+                        if(i==1){
+                            this.ruleForm.typetwo=Number(this.coureInfo.sid)
+                        }else{
+                            this.ruleForm.typetwo=this.Stype[0].id
+                        }
+                        
+                    }else{
+                        this.ruleForm.typetwo=''
+                    }
+                    
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+            //console.log(this.ruleForm.typetwo)
+        },
+        choosetype(i,index,item){
+            this.selectedtype=[]
+            this.checkedtypes=[]
+            if(i==1){
+                var data1={}
+                if(index!=this.isChange){
+                    this.isChange = index;
+                    data1.pid=item.pid
+                    data1.id=item.id
+                   // console.log(data1)
+                }else{
+                    data1={}
+                    this.isChange = -1;
+
+                }
+                if(data1.pid&&data1.id){
+                    this.ty1=data1
+                }else{
+                    this.ty1={}
+                }
+            }else if(i==2){
+                var data2={}
+                if(index!=this.isChange1){
+                    this.isChange1 = index;
+                    data2.pid=item.pid
+                    data2.id=item.id
+                    //console.log(data2)
+                }else{
+                    data2={}
+                    this.isChange1 = -1;
+
+                }
+                if(data2.pid&&data2.id){
+                    this.ty2=data2
+                }else{
+                    this.ty2={}
+                }
+            }else if(i==3){
+                var data3={}
+                if(index!=this.isChange2){
+                    this.isChange2 = index;
+                    data3.pid=item.pid
+                    data3.id=item.id
+                    //console.log(data3)
+                }else{
+                    data3={}
+                    this.isChange2 = -1;
+
+                }
+                if(data3.pid&&data3.id){
+                    this.ty3=data3
+                }else{
+                    this.ty3={}
+                }
+            }
+            if(this.ty1.pid&&this.ty1.id){
+                this.selectedtype.push(this.ty1)
+            }
+            if(this.ty2.pid&&this.ty2.id){
+                this.selectedtype.push(this.ty2)
+            }
+            if(this.ty3.pid&&this.ty3.id){
+                this.selectedtype.push(this.ty3)
+            }
+            //console.log(this.selectedtype)
+            this.dataset()
+            //console.log(this.checkedtypes)
+        },
+        dataset(){
+            for(var i=0;i<this.selectedtype.length;i++){
+                var data=''
+                data=this.selectedtype[i].id
+                this.checkedtypes.push(data)
+               
+            }
+        },
+        // 加载china地点数据，三级
+        getCityData:function(){
+            var that = this
+            //var url = `../../../static/css/map.json`
+            var url = this.$host + `admin/course/get_course_zone`
+            this.axios.get(url).then(function(response){
+            if (response.status==200) {
+                console.log(response)
+                var data = response.data
+                that.province = []
+                that.city = []
+                that.block = []
+                // 省市区数据分类
+                for (var item in data) {
+                    if (item.match(/0000$/)) {//省
+                        that.province.push({id: item, value: data[item], children: []})
+                    } else if (item.match(/00$/)) {//市
+                        that.city.push({id: item, value: data[item], children: []})
+                    } else {//区
+                        that.block.push({id: item, value: data[item]})
+                    }
+                }
+                // 分类市级
+                for (var index in that.province) {
+                    for (var index1 in that.city) {
+                        if (that.province[index].id.slice(0, 2) === that.city[index1].id.slice(0, 2)) {
+                        that.province[index].children.push(that.city[index1])
+                        }
+                    }
+                }
+                // 分类区级
+                for(var item1 in that.city) {
+                    for(var item2 in that.block) {
+                        if (that.block[item2].id.slice(0, 4) === that.city[item1].id.slice(0, 4)) {
+                        that.city[item1].children.push(that.block[item2])
+                        }
+                    }
+                }
+            }
+            else{
+                //console.log(response.status)
+            }
+            }).catch(function(error){console.log(typeof+ error)})
+        },
+        // 选省
+        choseProvince:function(e) {
+            console.log(e)
+            for (var index2 in this.province) {
+            if (e === this.province[index2].value) {
+                //console.log(this.province[index2].id)//你选择的省级编码
+                //console.log(this.province[index2].value)//省级编码 对应的汉字 
+                this.shi1 = this.province[index2].children
+                this.shi = this.province[index2].children[0].value
+                this.qu1 =this.province[index2].children[0].children
+                this.qu = this.province[index2].children[0].children[0].value
+                this.E = this.qu1[0].value
+            }
+            }
+        },
+        // 选市
+        choseCity:function(e) {
+            for (var index3 in this.city) {
+            if (e === this.city[index3].value) {
+                this.qu1 = this.city[index3].children
+                this.qu = this.city[index3].children[0].value
+                this.E = this.qu1[0].value
+                // console.log(this.E)
+            }
+            }
+        },
+        // 选区
+        choseBlock:function(e) {
+            this.E=e;
+            // console.log(this.E)
+        },
+        add(){
+            var data=[]
+            //console.log(this.ruleForm.sheng+this.ruleForm.shi+this.ruleForm.qu)
+            // var address=`${this.ruleForm.sheng}${this.ruleForm.shi}${this.ruleForm.qu}`
+            if(this.ruleForm.qu!=''){
+                data.push(this.ruleForm.sheng,this.ruleForm.shi,this.ruleForm.qu)
+                this.citys.push(data)
+            }else{
+                this.$message.error('请选择服务区！');
+            }
+            
+            //console.log(this.citys)
+        },
+        delcity(i){
+            this.citys.splice(i,1)
+        },
+        handleVideoSuccess(res, file) { 
+            this.ruleForm.videoUrl = res.dest;
+        },
+        delvideo(){
+            this.ruleForm.videoUrl=""
+        },
+        //上传封面图
+        handlePreview(file) {
+            // console.log(file);
+            //this.imageUrl=file.dest; 
+            var img=file.dest;
+            this.ruleForm.imageUrl1.push(img);
+            //console.log(this.imageUrl)
+        },
+        del(item){
+            //console.log(item)
+            this.ruleForm.imageUrl1.splice(item,1)
+            //console.log(this.imageUrl)
+        },
+        save(){
+            this.ueditor.value = this.$refs.ue.getUEContent();
+            var data={
+                course_id:this.id,
+                course_name:this.ruleForm.name,
+                course_type:this.selectedtype,
+                user_id:this.teacherid,
+                course_level:this.ruleForm.differ,
+                class_id:this.ruleForm.courenum,
+                unit_price:this.ruleForm.singleP,
+                total_price:this.ruleForm.totalP,
+                course_start_time:this.ruleForm.date1,
+                course_end_time:this.ruleForm.date2,
+                coupon_amount:this.ruleForm.coupon,
+                coupon_start_time:this.ruleForm.date3,
+                coupon_end_time:this.ruleForm.date4,
+                service_region:this.citys,
+                course_video:this.ruleForm.videoUrl,
+                course_cover:this.ruleForm.imageUrl1,
+                description:this.ueditor.value
+            }
+            // console.log(data)
+            // return
+            const url = this.$host + `admin/course/save_course`;
+            //console.log(url)
+            this.axios.post(url,data).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    if(resData.code==1){
+                        this.$message({
+                            message:resData.msg,
+                            type: 'success'
+                        });
+                        this.$router.push('/courelist')
+                    }else{
+                        this.$message.error(resData.msg);
+                    }
+                    
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            }).catch(error=>{
+                this.$message.error('网络错误！请稍后重试！');
+                    console.log(error);
+             })
+            
+            
+        },
+        // 选择教练
+        loadAll() {
+            return this.typeid;
+        },
+        querySearchAsync(queryString, cb) {
+            var restaurants = this.restaurants;
+            var results = queryString ? restaurants.filter(this.createStateFilter(queryString)) : restaurants;
+
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(() => {
+            cb(results);
+            }, 3000 * Math.random());
+        },
+        createStateFilter(queryString) {
+            return (state) => {
+            return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+            };
+        },
+        handleSelect(item) {
+            //console.log(item);
+            this.teacherid=item.user_id
+        },
+        
+    },
+}
+</script>
+<style lang="scss">
+.addcoure{
+    .content{
+        .top{
+            height: 60px;
+            border-bottom: 1px solid #e9e9e9;
+            .btn{
+                width: 50px;
+                height: 30px;
+                text-align: center;
+                line-height: 30px;
+                border-radius: 5px;
+            }
+        }
+        .mine{
+            padding-bottom: 20px;
+            padding-top: 20px;
+            .add{
+                margin-left: 20px;
+                width: 87px;
+                height: 30px;
+                line-height: 30px;
+                border-radius: 6px;
+                text-align: center;
+                margin-top: 5px;
+            }
+            .types{
+                display: flex;
+                align-items: center;
+                div{
+                    margin-left: 10px;
+                    display: flex;
+                    span{
+                        width: auto;
+                        height: 25px;
+                        padding: 0 10px;
+                        border-radius: 5px;
+                        line-height: 25px;
+                        color: #444;
+                        border: 1px solid #e9e9e9;
+                        background-color: #fff;
+                    }
+                    .active{
+                        background-color: #1BA687;
+                        color: #fff;
+                        border: 1px solid #1BA687;
+                    }
+                }
+            }
+            .citylist{
+                margin-left: 50px;
+                ul{
+                    padding-bottom: 20px;
+                    margin-top: 10px;
+                    li{
+                        width: 300px;
+                        height: 25px;
+                        line-height: 25px;
+                        border-bottom: 1px solid #e9e9e9;
+                    }
+                }
+            }
+            .videoBox{
+                position: relative;
+                width: 250px;
+                height: 120px;
+                margin-bottom: 20px;
+                video{
+                    width: 250px;
+                    height: 120px;
+                }
+                span{
+                    width: 20px;
+                    height: 20px;
+                    display: block;
+                    right: -10px;
+                    margin-top: -22px;
+                    position: absolute;
+                    cursor: pointer;
+                }
+            }
+            .imgBox{
+                
+                ul{
+                display:flex;
+                flex-wrap: wrap;
+                li{
+                margin: 0 10px;
+                position: relative;
+                span{
+                    width: 20px;
+                    height: 20px;
+                    display: block;
+                    right: -10px;
+                    margin-top: -22px;
+                    position: absolute;
+                    cursor: pointer;
+                }
+                }
+                
+                }
+                
+            }
+        }
+    }
+}
+</style>

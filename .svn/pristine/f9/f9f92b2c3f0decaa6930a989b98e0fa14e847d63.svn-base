@@ -1,0 +1,273 @@
+<template>
+    <div class="sliderImg">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">轮播图管理<span>(建议尺寸：750*534)</span></div>
+                <div class="add btn color-f bg-active" @click="add">添加</div>
+            </div>
+            <div class="list">
+                <el-table :data="sliderList" stripe border style="width: 100%">
+                    <el-table-column type="index" width="100" label="序号">
+                    </el-table-column>
+                    <el-table-column label="图片" width="200">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.slide_cover" alt="" class="long">
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="链接" width="">
+                        <template slot-scope="scope">
+                            <input type="text" v-model="scope.row.slide_url" class="links" @change="change(scope.row,1)">
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="排序" width="120">
+                        <template slot-scope="scope">
+                            <input type="text" v-model="scope.row.sort" class="sort" @change="change(scope.row,2)">
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="200" >
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="del(scope.row.id)">删除</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+            <div class="addbox">
+                <el-dialog title="添加广告图" :visible.sync="addbox">
+                    <div class="imgbox">
+                    <el-upload
+                    class="avatar-uploader"
+                    action="https://test.izhixiu.cn/www/yoga/upload_file"
+                    :show-file-list="false"
+                    :on-success="handleAvatarSuccess1"
+                    >
+                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                    <el-button @click="addbox = false">取 消</el-button>
+                    <el-button type="primary" @click="sure()">确 定</el-button>
+                    </div>
+                </el-dialog>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            addbox:false,
+            imageUrl:'',
+            total_page:1,
+            sliderList:[]
+        }
+    },
+    created(){
+        this.getSliderlist(1)
+    },
+    methods:{
+        getSliderlist(page){
+            const url = this.$host + `admin/slide`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    
+                }
+              }).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    // this.$message({
+                    //     message: '恭喜你，这是一条成功消息',
+                    //     type: 'success'
+                    // });
+                    this.sliderList=resData.result
+                    this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        // 删除
+        del(i){
+            //console.log(i)
+            const url =  this.$host + `admin/slide/delete_slide`;
+            var data = {
+                'slide_id': i,
+            };
+            //console.log(data)
+            this.axios.post(url, data).then(res => {
+               // console.log(res);
+                var resData=res.data
+                if(res.status==200){
+                    if(resData.code==1){
+                        this.$message({
+                            message: resData.msg,
+                            type: 'success'
+                        });
+                        this.getSliderlist(1)
+                    }else{
+                        this.$message({
+                            message: '操作失败！请重试',
+                            type: 'warning'
+                        });
+                    }
+                    
+                }else{
+                    this.$message({
+                        message: '操作失败！请重试',
+                        type: 'warning'
+                    });
+                }
+                
+            }).catch(error => {
+                this.$message({
+                    message: '操作失败！请重试',
+                    type: 'warning'
+                });
+                    // console.log(error);
+            });
+        },
+        // 添加广告
+        add(){
+            
+            this.imageUrl="";
+            this.addbox=true
+        },
+        // 上传图片
+        sure(){
+            if(!this.imageUrl){
+                this.$message({
+                    message: '图片不能为空！',
+                    type: 'warning'
+                });
+                return
+            }
+            //console.log(this.imageUrl)
+            const url =  this.$host + `admin/slide/add_slide`;
+            var data = {
+                'slide_cover': this.imageUrl,
+            };
+            //console.log(data)
+            this.axios.post(url, data).then(res => {
+                //console.log(res);
+                if(res.status==200){
+                    this.$message({
+                        message: '上传成功！',
+                        type: 'success'
+                    });
+                    this.addbox=false
+                    this.getSliderlist(1)
+                }else{
+                    this.$message({
+                        message: '上传失败！请重试',
+                        type: 'warning'
+                    });
+                }
+                
+            }).catch(error => {
+                this.$message({
+                    message: '上传失败！请重试',
+                    type: 'warning'
+                });
+                    // console.log(error);
+            });
+        },
+        // 排序链接
+        change(item,i){
+            var value=''
+            if(i==1){
+                value=item.slide_url
+            }else if(i==2){
+                value=item.sort
+            }
+            const url =  this.$host + `admin/slide/edit_slide`;
+            var data = {
+                'slide_id': item.id,
+                'mtype':i,
+                'val':value
+            };
+            //console.log(data)
+            this.axios.post(url, data).then(res => {
+               //console.log(res);
+                var resData=res.data
+                if(res.status==200){
+                    if(resData.code==1){
+                        this.$message({
+                            message: resData.msg,
+                            type: 'success'
+                        });
+                        this.getSliderlist()
+                    }else{
+                        this.$message({
+                            message: '操作失败！请重试',
+                            type: 'warning'
+                        });
+                    }
+                    
+                }else{
+                    this.$message({
+                        message: '操作失败！请重试',
+                        type: 'warning'
+                    });
+                }
+                
+            }).catch(error => {
+                this.$message({
+                    message: '操作失败！请重试',
+                    type: 'warning'
+                });
+                    // console.log(error);
+            });
+        },
+        handleAvatarSuccess1(file) {
+            this.imageUrl = file.dest;
+            //console.log(this.imageUrl)
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+            this.getSliderlist(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.sliderImg{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                span{
+                    font-size: 14px;
+                    color: #E51C23;
+
+                }
+            }
+            .add{
+                
+                width: 87px;
+                height: 30px;
+                line-height: 30px;
+                border-radius: 6px;
+                
+                text-align: center;
+            }
+        }
+    }
+}
+</style>

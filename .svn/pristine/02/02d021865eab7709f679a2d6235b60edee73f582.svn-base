@@ -1,0 +1,48 @@
+<template>
+   <div class="editorBox">
+       <div id="editor" ></div>
+    </div> 
+</template>
+<script>
+export default {
+    props: {
+        value: '',
+        config: {}
+      },
+    data(){
+        return{
+            editor:'',
+        }
+    },
+    created(){
+     
+    },
+  mounted() {
+    // 实例化editor编辑器
+    this.editor = window.UE.getEditor('editor', this.config);
+    this.editor.addListener('ready', () => {
+        this.editor.setContent(this.value)
+        //console.log(this.value)
+         })
+    // console.log(this.editor.setContent("1223"))
+  },
+  methods: {
+    
+    getUEContent() {
+      // 获取editor中的文本
+      return this.editor.getContent();
+      console.log(this.editor.getContent());
+    },
+
+  },
+  destroyed() {
+    // 将editor进行销毁
+    this.editor.destroy();
+  }
+}
+</script>
+<style lang="scss">
+ #editor {
+      width: 85%;
+    }
+</style>

@@ -1,0 +1,66 @@
+<template>
+    <div class="setwithdrawal">
+        <div class="content bg-f">
+            <div class="top space-between  padding-24">
+                <p class="fs-16">提现设置</p>
+                <div class="bg-active color-f save btn">保存</div>
+            </div>
+            <div class="tabel padding-24">
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" class="demo-ruleForm">
+                    <el-form-item label="提现额度（元）：" prop="money" >
+                        <el-input v-model="ruleForm.money" style="width:200px"></el-input><span style="margin-left:20px">（分销商的佣金达到此额度时才能提现，最低100元）</span>
+                    </el-form-item>
+                    <el-form-item label="结算天数：" prop="day">
+                        <el-input v-model="ruleForm.day" style="width:200px"></el-input><span style="margin-left:20px">（当订单完成后的n天后，佣金才能申请提现）</span>
+                    </el-form-item>
+                    
+                </el-form>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            ruleForm:{
+                money:'',
+                day:'',
+                
+            },
+            rules: {
+                money: [
+                    { required: true, message: '请输入提现额度', trigger: 'blur' },
+                ],
+                day: [
+                    { required: true, message: '请输入结算天数', trigger: 'blur' },
+                ],
+               
+            }
+        }
+    }
+}
+</script>
+<style lang="scss">
+.setwithdrawal{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            border-bottom: 1px solid #e9e9e9;
+            .save{
+                width: 60px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                border-radius: 5px;
+            }
+            
+        }
+        .tabel{
+            padding-bottom: 20px;
+            padding-top: 20px;
+        }
+    }
+}
+</style>

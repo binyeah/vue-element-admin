@@ -1,0 +1,167 @@
+<template>
+    <div class="evaluation">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <el-input placeholder=" 请输入您要搜索的内容" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>                    
+                </div>
+            </div>
+            <div class="list">
+                <el-table :data="evaluationlist" ref="multipleTable" stripe border style="width: 100%" >
+                    <el-table-column prop="order_sn" label="订单号" width="180">
+                    </el-table-column>
+                    <el-table-column label="用户" width="150">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.user_nickname}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="课程内容">
+                        <template slot-scope="scope">
+                            <div class="center-col">
+                                <img :src="scope.row.course_cover[0]" alt="" class="sq">
+                                <p>{{scope.row.course_name}}</p>
+                            </div>
+                            
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="评价星级" width="160">
+                        <template slot-scope="scope">
+                            <div class="space-around">
+                                <evaluaStar :defaultRating.default='Number(scope.row.star_level)' :readOnly.default='click'></evaluaStar>
+                                <p class="color-active">{{scope.row.star_level}}分</p>
+                            </div>
+                            
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="评价内容" width="150">
+                        <template slot-scope="scope">
+                            <p class="color-active btn" @click="look(scope.row)">查看详情</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="created_at" label="评价时间" width="180">
+                    </el-table-column>
+                    
+                    
+                    <el-table-column label="操作" width="150">
+                        <template slot-scope="scope">
+                            <div class="btn active" @click="hidden(scope.row.id)">隐藏</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+        <div class="addbox">
+            <el-dialog title="评价详情" :visible.sync="evaluationbox">
+                <p>评价内容：{{evaluat.evaluation_content}}</p>
+                <div>
+                    <img :src="item" alt="" v-for="(item,index) in evaluat.evaluation_img" :key="index" class="img" @click="lookimg(item)">
+                </div>
+            </el-dialog>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            total_page:1,
+            input:'',
+            click:true,
+            evaluat:'',
+            evaluationbox:false,
+            evaluationlist:[]
+        }
+    },
+    created(){
+        this.getevaluationlist(1)
+    },
+    methods:{
+        getevaluationlist(page){
+            const url=this.$host + `admin/course_evaluation`
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    keyword:this.input,
+                }
+              }).then(res=>{
+                    console.log(res)
+                    this.evaluationlist=res.data.result
+                    this.total_page=res.data.total_number
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        serch(){
+            this.getevaluationlist(1)
+        },
+        hidden(i){
+            var data={
+                course_evaluation_id:i
+            }
+            const url=this.$host + `admin/course_evaluation/hidden_evaluation`
+            this.axios.post(url,data).then(res=>{
+                    console.log(res)
+                    var resData=res.data
+                    if(resData.code==1){
+                        this.$message({
+                            message:resData.msg,
+                            type: 'success'
+                        });
+                        this.getevaluationlist(1)
+                    }
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        handleCurrentChange(val) {
+            this.getevaluationlist(val)
+            //console.log(`当前页: ${val}`);
+        },
+        look(i){
+            //console.log(i)
+            this.evaluat=i
+            this.evaluationbox=true
+        },
+        lookimg(i){
+            window.open(i, '_blank');
+        }
+    }
+}
+</script>
+<style lang="scss">
+.evaluation{
+    .content{
+        height: auto;
+        padding-bottom: 20px;
+        .top{
+            height: 80px;
+            .add{
+                
+                width: 87px;
+                height: 30px;
+                line-height: 30px;
+                border-radius: 6px;
+                
+                text-align: center;
+            }
+        }
+    }
+    .addbox{
+        display: flex;
+        img{
+            width: 120px;
+            height: 120px;
+            margin: 0 10px 10px 0;
+        }
+    }
+}
+</style>

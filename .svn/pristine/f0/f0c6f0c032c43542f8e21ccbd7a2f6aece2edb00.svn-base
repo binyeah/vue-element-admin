@@ -1,0 +1,179 @@
+<template>
+    <div class="withdrawal">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <el-input placeholder=" 请输入您要搜索的内容" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+
+                    <div class="btn" :class="{current:cur==1}" @click="select(1)">待处理</div>
+                    <div class="btn" :class="{current:cur==2}" @click="select(2)">待打款</div>
+                    <div class="btn" :class="{current:cur==3}" @click="select(3)">已打款</div>
+                    <div class="btn" :class="{current:cur==4}" @click="select(4)">已拒绝</div>
+                </div>
+                
+            </div>
+            <div class="list">
+                <el-table :data="teacherlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="50" label="序号">
+                    </el-table-column>
+                    <el-table-column label="头像" width="150">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.img" alt="" class="header">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="name" label="名称" width="200">
+                    </el-table-column>
+                    <el-table-column prop="phone" label="联系电话" width="150">
+                    </el-table-column>
+                    <el-table-column prop="money" label="提现金额" >
+                    </el-table-column>
+                    <el-table-column prop="time" label="申请时间" >
+                    </el-table-column>
+                    <el-table-column label="状态" width="150">
+                        <template slot-scope="scope">
+                            <p class="color-r" v-if="scope.row.status==1">待处理</p>
+                            <p class="color-r" v-if="scope.row.status==2">待打款</p>
+                            <p class="color-4" v-if="scope.row.status==3">已打款</p>
+                            <p class="color-4" v-if="scope.row.status==4">已拒绝</p>
+                        </template>
+                    </el-table-column>
+                    
+                    <el-table-column label="操作" width="200" v-if="cur==1||cur==2">
+                        <template slot-scope="scope">
+                            <div class="space-around">
+                                <div class="btn active" @click="agree(scope.row.id)" v-if="cur==1">同意</div>
+                                <div class="btn del" @click="disagree(scope.row.id)" v-if="cur==1">拒绝</div>
+                                <div class="btn active" @click="agree(scope.row.id)" v-if="cur==2">打款</div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            cur:1,
+            input:'',
+            total_page:1,
+            teacherlist:[
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    money:500,
+                    phone:'15545845454',
+                    
+                    time:'2019-06-10',
+                    id:1,
+                    status:1,
+                    
+                },
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    sex:'女',
+                    phone:'15545845454',
+                    money:500,
+                    time:'2019-06-10',
+                    id:1,
+                    status:2,
+                    
+                },
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    sex:'女',
+                    phone:'15545845454',
+                    money:500,
+                    time:'2019-06-10',
+                    id:1,
+                    status:3,
+                    
+                },
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    sex:'女',
+                    phone:'15545845454',
+                    money:500,
+                    time:'2019-06-10',
+                    id:1,
+                    status:4,
+                    
+                }
+            ]
+        }
+    },
+    methods:{
+        select(i){
+            this.cur=i
+        },
+        agree(i){
+
+        },
+        disagree(i){
+            
+        },
+        serch(){
+
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+        },
+    }
+}
+</script>
+<style lang="scss">
+.withdrawal{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                .btn{
+                    margin-left: 10px;
+                    width: 87px;
+                    height: 30px;
+                    line-height: 30px;
+                    border-radius: 8px;
+                    color: #444;
+                    border: 1px solid #e9e9e9;
+
+                    text-align: center;
+
+                }
+                .current{
+                    background-color: #1BA687;
+                    color: #fff;
+                    border: 1px solid #1BA687;
+                }
+            }
+            .add{
+                
+                width: 87px;
+                height: 30px;
+                line-height: 30px;
+                border-radius: 6px;
+                
+                text-align: center;
+            }
+        }
+    }
+}
+</style>

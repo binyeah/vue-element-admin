@@ -1,0 +1,139 @@
+<template>
+    <div class="accountlist">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <el-input placeholder=" 请输入您要搜索的内容" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div>
+                <div class="btn bg-active color-f add" @click="add()">添加</div>
+            </div>
+            <div class="list">
+                <el-table :data="accountlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="120" label="序号">
+                    </el-table-column>
+                    <!-- <el-table-column label="头像" >
+                        <template slot-scope="scope">
+                            <img :src="scope.row.img" alt="" class="header">
+                        </template>
+                    </el-table-column> -->
+                    <el-table-column prop="admin_account" label="账号" >
+                    </el-table-column>
+                    <el-table-column prop="admin_password" label="密码" >
+                    </el-table-column>
+                    <el-table-column label="操作" >
+                        <template slot-scope="scope">
+                            <div class="center-col">
+                                <div class="btn active" @click="edit(scope.row.id)">编辑</div>
+                                <div class="btn del" @click="del(scope.row.id)" >删除</div>
+                            </div>
+                            
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            accountlist:[
+                {
+                    img:require("../../assets/logo.png"),
+                    num:'6874545674',
+                    psd:'684845dsfd',
+                    id:'845'
+                }
+            ]
+        }
+    },
+    created(){
+        this.getAccountList(1)
+    },
+    methods:{
+        getAccountList(page){
+            const url = this.$host + `admin/account`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    // this.$message({
+                    //     message: '恭喜你，这是一条成功消息',
+                    //     type: 'success'
+                    // });
+                    this.accountlist=resData.result
+                    this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        serch(){
+
+        },
+        add(){
+            this.$router.push({
+                path: '/addacount',
+                query: {
+                    id:''
+                }
+            })
+        },
+        edit(i){
+            this.$router.push({
+                path: '/addacount',
+                query: {
+                    id:i
+                }
+            })
+        },
+        del(i){
+
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+            this.getAccountList(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.accountlist{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .add{
+                width: 60px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                border-radius: 5px;
+            }
+            
+        }
+    }
+}
+</style>

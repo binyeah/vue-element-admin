@@ -1,0 +1,166 @@
+<template>
+    <div class="selforder">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <img :src="cove" alt="">
+                    <p class="fs-18">{{teachername}}</p>
+                    <div class="center-col" style="margin-left:20px">
+                        <p>订单状态：</p>
+                        <el-select v-model="value" placeholder="请选择">
+                            <el-option key="" label="全部" value="">
+                            </el-option>
+                            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+            </div>
+            <div class="list">
+                <el-table :data="orderlist" stripe border style="width: 100%">
+                    <el-table-column prop="ordernum" label="订单号" width="150">
+                    </el-table-column>
+                    <el-table-column prop="name" label="用户" width="80">
+                    </el-table-column>
+                    <el-table-column prop="phone" label="联系电话" width="120">
+                    </el-table-column>
+
+                    <el-table-column label="订单内容" >
+                        <template slot-scope="scope">
+                            <div class="space-around">
+                                <img :src="scope.row.img" alt="" class="sq">
+                                <p>{{scope.row.courename}}</p>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="kinds" label="类型" width="120">
+                    </el-table-column>
+                    <el-table-column prop="couretime" label="课时" width="80">
+                    </el-table-column>
+                    <el-table-column prop="differ" label="难度" width="80">
+                    </el-table-column>
+                    <el-table-column prop="singelprice" label="单价" width="80">
+                    </el-table-column>
+                    <el-table-column prop="totalprice" label="总价" width="80">
+                    </el-table-column>
+                    <el-table-column label="进度" width="100">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.end}}/{{scope.row.total}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="status" label="状态" width="100">
+                    </el-table-column>
+                    <el-table-column prop="time" label="下单时间" width="180">
+                    </el-table-column>
+                    
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            total_page:1,
+            options: [
+                {
+                value: '1',
+                label: '已完成'
+                }, 
+                {
+                value: '2',
+                label: '未完成'
+                }, 
+                
+                
+            ],
+            cove:require("../../assets/logo.png"),
+            teachername:'xxx',
+            value: '',
+            id:'',
+            orderlist:[
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    phone:'15545845454',
+                    id:1,
+                    ordernum:'47847gfhgf25805',
+                    courename:'课程名称哈哈哈哈好哈哈哈好不会哈哈哈',
+                    kinds:'课程类型',
+                    couretime:'12',
+                    differ:'LV5',
+                    singelprice:'190',
+                    totalprice:'500',
+                    end:'1',
+                    total:'5',
+                    status:'未完成',
+                    time:'2019-06-10 05:15:30',
+                    
+                },
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    phone:'15545845454',
+                    id:2,
+                    ordernum:'47847805',
+                    courename:'课程名称哈哈哈哈好哈哈哈好不会哈哈哈',
+                    kinds:'课程类型',
+                    couretime:'12',
+                    differ:'LV5',
+                    singelprice:'190',
+                    totalprice:'500',
+                    end:'1',
+                    total:'5',
+                    status:'已完成',
+                    time:'2019-06-10 05:15:30',
+                }
+            ],
+        }
+    },
+    created(){
+        this.id=this.$route.query.id
+    },
+    methods:{
+        ban(i){
+            
+        },
+        serch(){
+
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+        },
+    }
+}
+</script>
+<style lang="scss">
+.selforder{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                img{
+                    width: 48px;
+                    height: 48px;
+                    border-radius:50%;
+                    margin-right: 20px;
+                }
+            }
+            
+        }
+    }
+}
+</style>

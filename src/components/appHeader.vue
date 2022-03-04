@@ -1,0 +1,90 @@
+<template>
+    <div class="header">
+      <el-container class="el_menu">
+          <div class="left">
+            管理后台
+          </div>
+          <ul class="right">
+            <!-- <li>
+                <span class="el-icon-refresh-right fs-20" @click="reload"></span>
+            </li>
+            <li>
+                <span class="el-icon-bell fs-20"></span>
+            </li>
+            <li>
+                <span class="el-icon-orange fs-20"></span>
+            </li>
+            <li>
+                <span class="el-icon-discount fs-20"></span>
+            </li>
+            <li>
+                <span class="el-icon-rank fs-20"></span>
+            </li> -->
+            <li>{{admin}}</li>
+            <li @click="logout">退出</li>
+          </ul>
+        </el-container>
+    </div>
+</template>
+<script>
+// import { setTimeout } from 'timers';
+// import {removeToken} from '@/util/util'
+export default {
+    data(){
+        return{
+            admin:"",
+            
+        }
+    },
+    created(){
+
+    },
+    methods:{
+      async logout(){
+        setTimeout(()=>{
+          this.$router.push('/login')
+        },1000)
+      }
+    }
+}
+</script>
+<style lang="scss">
+.header{
+    width:100%;
+    height: 60px;
+     //position: absolute;
+    top: 0;
+    // border-bottom: 1px solid #e9e9e9;
+    // background-color: green;
+    .el_menu {
+      display: flex;
+      top: 0;
+      width: 100%;
+      height: 60px;
+      justify-content: space-between;
+      position: relative;
+    }
+    .left{
+      line-height: 60px;
+      color: #333;
+    }
+    .el_menu .right {
+      margin-right: 24px;
+      height: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+  .el_menu .right li {
+    height: 20px;
+    cursor: pointer;
+    margin: 0 10px;
+    display: block;
+    color: #333;
+    img{
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+</style>

@@ -1,0 +1,412 @@
+<template>
+    <div class="data">
+        <div class="content">
+            <div class="top-nav space-around">
+                <div v-for="(item,index) in datatop" :key="index" class="center-col">
+                    <span v-if="item.num>0">!</span>
+                    <p>{{item.title}}</p>
+                    <p class="num color-r fs-28">{{item.num}}</p>
+                </div>
+            </div>
+            <div class="content-nav space-between">
+                <div class="nav-item" v-for="(item,index) in datacontent" :key="index">
+                    <p class="color-r fs-28">{{item.num}}</p>
+                    <p class="color-6 fs-14">{{item.title}}</p>
+                </div>
+            </div>
+            <div class="chart-one bg-f">
+                <div class="padding-24 space-between top">
+                    <div class="center-col left">
+                        <span class="el-icon-s-custom"></span>
+                        <p class="fs-15 color-4">订单金额统计</p>
+                    </div>
+                    <div class="center-col right">
+                        <p class="fs-14 color-6">年份选择：</p>
+                        <select name="" id="" v-model="yearOne" @change="selectyear()">
+                            <option :value="item" v-for="(item,index) in years" :key="index">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <div class="chart" id="orderMoney"></div>
+                </div>
+            </div>
+            <div class="chart-two space-between">
+                <div class="chart-item bg-f">
+                    <div class="padding-24 space-between top">
+                        <div class="center-col left">
+                            <span class="el-icon-s-custom"></span>
+                            <p class="fs-15 color-4">学员统计</p>
+                        </div>
+                        <div class="center-col right">
+                            <p class="fs-14 color-6">年份选择：</p>
+                            <select name="" id="" v-model="yearOne" @change="selectyear()">
+                                <option :value="item" v-for="(item,index) in years" :key="index">{{item}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart" id="students"></div>
+                    </div>
+                </div>
+                <div class="chart-item bg-f">
+                    <div class="padding-24 space-between top">
+                        <div class="center-col left">
+                            <span class="el-icon-s-custom"></span>
+                            <p class="fs-15 color-4">订单数统计</p>
+                        </div>
+                        <div class="center-col right">
+                            <p class="fs-14 color-6">年份选择：</p>
+                            <select name="" id="" v-model="yearOne" @change="selectyear()">
+                                <option :value="item" v-for="(item,index) in years" :key="index">{{item}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <div class="chart" id="orders"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+var echarts=require('echarts');
+export default {
+    data(){
+        return{
+            datatop:[
+                {
+                    title:'待完成订单数：',
+                    num:99,
+                },
+                {
+                    title:'待审核瑜伽馆数：',
+                    num:99,
+                },
+                {
+                    title:'待审核教练人数：',
+                    num:0,
+                }
+            ],
+            datacontent:[
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+                {
+                    title:'今日新增销售额',
+                    num:9999,
+                },
+            ],
+            years:['2010','2011','2012','2013','2014','2015'],
+            yearOne:'',
+            dataTime:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+            orderMoney:['155','15','100','120','180','210','20','30','160','170','110','90']
+        }
+    },
+    created(){
+
+    },
+    mounted(){
+        this.getEchartsData()
+    },
+    methods:{
+        selectyear(){
+            console.log(this.yearOne)
+            this.getEchartsData()
+        },
+        getEchartsData(){
+            var orderMoneyChart=echarts.init(document.getElementById('orderMoney'));
+            var students=echarts.init(document.getElementById('students'));
+            var orders=echarts.init(document.getElementById('orders'));
+            var orderoption = {
+                tooltip : {
+                trigger: 'axis'
+                },
+                toolbox: {
+                show : true,
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : this.dataTime
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'订单数',
+                        type:'line',
+                        smooth: true,
+                        areaStyle: {},
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [{
+                                offset: 0, color: '#5A98DE' // 0% 处的颜色
+                            }, {
+                                offset: 1, color: '#5A98DE' // 100% 处的颜色
+                            }],
+                            global: false // 缺省为 false
+                        },
+                        // data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 100],
+                        data:this.orderMoney,
+                    },
+                ],
+            
+            };
+
+            var studentsChart = {
+                tooltip : {
+                    trigger: 'axis'
+                },
+                toolbox: {
+                    show : true,
+                    
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : this.dataTime
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'订单数',
+                        type:'line',
+                        smooth: true,
+                        areaStyle: {},
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [{
+                                offset: 0, color: '#5A98DE' // 0% 处的颜色
+                            }, {
+                                offset: 1, color: '#5A98DE' // 100% 处的颜色
+                            }],
+                            global: false // 缺省为 false
+                        },
+                        // data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 100],
+                        data:this.orderMoney,
+                    },
+                ],
+              
+            };
+            var ordersChart = {
+                tooltip : {
+                    trigger: 'axis'
+                },
+                toolbox: {
+                    show : true,
+                    
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : this.dataTime
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'订单数',
+                        type:'line',
+                        smooth: true,
+                        areaStyle: {},
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [{
+                                offset: 0, color: '#5A98DE' // 0% 处的颜色
+                            }, {
+                                offset: 1, color: '#5A98DE' // 100% 处的颜色
+                            }],
+                            global: false // 缺省为 false
+                        },
+                        // data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 100],
+                        data:this.orderMoney,
+                    },
+                ],
+              
+            };
+            orderMoneyChart.setOption(orderoption);
+            students.setOption(studentsChart);
+            orders.setOption(ordersChart);
+      }
+    }
+}
+</script>
+<style lang="scss">
+.data{
+    .content{
+        .top-nav{
+            height: 60px;
+            line-height: 20px;
+            border-radius: 8px;
+            background-color:#fff;
+            font-size: 14px;
+            text-align: center;
+            font-family: Roboto;
+            .center-col{
+                span{
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    display: block;
+                    color: #fff;
+                    text-align: center;
+                    line-height: 20px;
+                    margin-right: 10px;
+                    background-color: #FE6361;
+                }
+            }
+        }
+        .content-nav{
+            height: 140px;
+            margin-top: 20px;
+            .nav-item{
+                width: 150px;
+                height: 100%;
+                margin: 0 2px;
+                text-align: center;
+                border-radius: 10px;
+                background-color: #fff;
+                .fs-28{
+                    margin-top: 40px;
+                }
+                .fs-14{
+                    margin-top: 10px
+                }
+            }
+            
+        }
+        .chart-one{
+            width: 100%;
+            height: 408px;
+            margin-top: 20px;
+            border-radius: 10px;
+            .top{
+                height: 50px;
+                border-bottom: 1px solid #e9e9e9;
+                .left{
+                    span{
+                        width: 20px;
+                        height: 20px;
+                        display: block;
+                        line-height: 20px;
+                        text-align: center;
+                        margin-right: 5px;
+                    }
+                }
+            }
+            .chart-content{
+                width: 100%;
+                height: 350px;
+                .chart{
+                    width: 100%;
+                    height: 100%;
+                    div:first-child{
+                        width: 100%!important;
+                        height: 100%!important;
+                        canvas{
+                            width: 100%!important;
+                            height: 100%!important;
+                        }
+                    }
+                }
+            }
+        }
+        .chart-two{
+            width: 100%;
+            height: 410px;
+            margin-top: 20px;
+            .chart-item{
+                width: 49%;
+                height: 100%;
+                border-radius: 10px;
+                    .top{
+                    height: 50px;
+                    border-bottom: 1px solid #e9e9e9;
+                    .left{
+                        span{
+                            width: 20px;
+                            height: 20px;
+                            display: block;
+                            line-height: 20px;
+                            text-align: center;
+                            margin-right: 5px;
+                        }
+                    }
+                }
+                .chart-content{
+                    width: 100%;
+                    height: 350px;
+                    .chart{
+                        width: 100%;
+                        height: 100%;
+                        margin: 0 auto;
+                        div:first-child{
+                            width: 100%!important;
+                            height: 100%!important;
+                            canvas{
+                                width: 100%!important;
+                                height: 100%!important;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+</style>

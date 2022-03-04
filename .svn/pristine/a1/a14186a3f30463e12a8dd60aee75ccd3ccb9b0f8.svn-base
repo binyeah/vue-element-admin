@@ -1,0 +1,277 @@
+<template>
+    <div class="teacheraudit">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <el-input placeholder=" 请输入您要搜索的内容" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+
+                    <div class="btn" :class="{current:cur==1}" @click="select(1)">待审核</div>
+                    <div class="btn" :class="{current:cur==2}" @click="select(2)">未通过</div>
+                    <div class="btn" :class="{current:cur==3}" @click="select(3)">已通过</div>
+                </div>
+                
+            </div>
+            <div class="list">
+                <el-table :data="teacherlist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="50" label="序号">
+                    </el-table-column>
+                    <el-table-column label="头像" width="80">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.user_portrait==''?noimg:scope.row.user_portrait" alt="" class="header">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="user_real_name" label="名称" width="100">
+                    </el-table-column>
+                    <el-table-column label="性别" width="80">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.user_sex==1?'男':'女'}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="user_phone" label="联系电话">
+                    </el-table-column>
+                    <el-table-column label="身份信息" >
+                        <template slot-scope="scope">
+                            <p class="link" @click="look(scope.row)">查看</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="资质" >
+                        <template slot-scope="scope">
+                            <img :src="scope.row.certificate==''?noimg:scope.row.certificate" alt="" class="mini" @click="lookzizhi(scope.row)">
+                        </template>
+                    </el-table-column>
+                    <!-- <el-table-column label="服务类型" width="150">
+                        <template slot-scope="scope">
+                            <p class="tableft">{{scope.row.service_type}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="服务地区" >
+                        <template slot-scope="scope">
+                            <p  class="tableft">
+                                <span v-for="(item,index) in scope.row.user_service_region" :key="index">{{item[1]+item[2]}};</span>
+                            </p>
+                            
+                        </template>
+                    </el-table-column> -->
+                    <el-table-column prop="apply_time" label="申请时间" >
+                    </el-table-column>
+                    <el-table-column label="审核状态" width="100">
+                        <template slot-scope="scope">
+                            <p :class="{colorr:scope.row.status==1}">{{scope.row.status==1?'待审核':(scope.row.status==2?'未通过':'已通过')}}</p>
+                            <!-- <p class="color-4" v-else>{{scope.row.status}}</p> -->
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="200" v-if="cur==1">
+                        <template slot-scope="scope">
+                            <div class="space-around">
+                                <div class="btn active" @click="agree(scope.row.user_id,1)">通过</div>
+                                <div class="btn del" @click="agree(scope.row.user_id,2)">不通过</div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+        <div class="addbox">
+            <el-dialog title="教练信息" :visible.sync="addbox">
+                <div class="">
+                    <el-form ref="form" :model="form" label-width="120px">
+                        <el-form-item label="身份证正面：">
+                            <img :src="form.identity_card_front==''?noimg:form.identity_card_front" alt="" class="idcard">
+                        </el-form-item>
+                        <el-form-item label="身份证反面：">
+                            <img :src="form.identity_card_backend==''?noimg:form.identity_card_backend" alt="" class="idcard">
+                        </el-form-item>
+                        <el-form-item label="手持身份证：">
+                            <img :src="form.hold_identity_card_front==''?noimg:form.hold_identity_card_front" alt="" class="idcard">
+                        </el-form-item>
+                    </el-form>
+                </div>
+                
+            </el-dialog>
+            <el-dialog title="资质证书" :visible.sync="zizhibox">
+                <div class="">
+                    <el-form ref="form" :model="form" label-width="120px">
+                        <el-form-item label="资质证书：">
+                            <img :src="form.certificate==''?noimg:form.certificate" alt="" class="zizhicard">
+                        </el-form-item>
+                        
+                    </el-form>
+                </div>
+                
+            </el-dialog>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            noimg:require("../../assets/timg.jpg"),
+            cur:1,
+            input:'',
+            total_page:1,
+            addbox:false,
+            zizhibox:false,
+            teacherlist:[],
+            form:{}
+        }
+    },
+    created(){
+        this.getteacherlist(1)
+    },
+    methods:{
+        select(i){
+            this.cur=i
+            this.getteacherlist(1)
+        },
+        getteacherlist(page){
+            const url = this.$host + `admin/service_personnel`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    keyword:this.input,
+                    is_coach:1,
+                    is_yoga:0,
+                    status:this.cur
+                }
+            }).then(res=>{
+                //console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    // this.$message({
+                    //     message: '恭喜你，这是一条成功消息',
+                    //     type: 'success'
+                    // });
+                    this.teacherlist=resData.result
+                    this.total_page=resData.total_number
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        look(i){
+            this.form=i
+            this.addbox=true
+            console.log(this.form)
+        },
+        lookzizhi(i){
+            this.form=i
+            this.zizhibox=true
+            //console.log(this.form)
+        },
+        agree(item,i){
+            //console.log(i)
+            const url =  this.$host + `admin/service_personnel/is_pass`;
+            var data = {
+                'mtype': i,
+                'user_id': item
+            };
+            //console.log(data)
+            this.axios.post(url, data).then(res => {
+                console.log(res);
+                var resData=res.data
+                if(res.status==200){
+                    if(resData.code==1){
+                        this.$message({
+                            message: '操作成功！',
+                            type: 'success'
+                        });
+                        this.getteacherlist(1)
+                    }else{
+                        this.$message({
+                            message: '操作失败！请重试',
+                            type: 'warning'
+                        });
+                    }
+                    
+                }else{
+                    this.$message({
+                        message: '操作失败！请重试',
+                        type: 'warning'
+                    });
+                }
+                
+            }).catch(error => {
+                this.$message({
+                    message: '操作失败！请重试',
+                    type: 'warning'
+                });
+                    // console.log(error);
+            });
+        },
+       
+        serch(){
+            this.getteacherlist(1)
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+            this.getteacherlist(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.teacheraudit{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                .btn{
+                    margin-left: 10px;
+                    width: 87px;
+                    height: 30px;
+                    line-height: 30px;
+                    border-radius: 8px;
+                    color: #444;
+                    border: 1px solid #e9e9e9;
+
+                    text-align: center;
+
+                }
+                .current{
+                    background-color: #1BA687;
+                    color: #fff;
+                    border: 1px solid #1BA687;
+                }
+            }
+            .add{
+                
+                width: 87px;
+                height: 30px;
+                line-height: 30px;
+                border-radius: 6px;
+                
+                text-align: center;
+            }
+        }
+       .mini{
+           cursor: pointer;
+       }
+        
+    }
+    .idcard{
+        width: 200px;
+        height: 150px;
+    }
+    .zizhicard{
+        width: 200px;
+        height: 250px;
+    }
+}
+</style>

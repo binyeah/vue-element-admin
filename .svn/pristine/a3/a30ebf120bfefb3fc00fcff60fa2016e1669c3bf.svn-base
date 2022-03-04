@@ -1,0 +1,125 @@
+<template>
+    <div class="advertise">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">广告位<span>(建议尺寸：342*164px)</span></div>
+            </div>
+            <div class="list">
+                <el-table :data="advertise" stripe border style="width: 100%">
+                    <el-table-column type="index" width="100" label="序号">
+                    </el-table-column>
+                    <el-table-column label="图片" width="300">
+                        <template slot-scope="scope">
+                            <div class="imgbox" @click="upimg(scope.row.id)">
+                                <el-upload
+                                class="avatar-uploader"
+                                action="https://test.izhixiu.cn/www/yoga/upload_file"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess1"
+                                >
+                                <img v-if="scope.row.advert_cover" :src="scope.row.advert_cover==''?noimg:scope.row.advert_cover" class="avatar long">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                </el-upload>
+                            </div>
+                            <!-- <img :src="scope.row.advert_cover==''?noimg:scope.row.advert_cover" alt="" class="long"> -->
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="名称" width="">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.advert_title}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="排序" width="350">
+                        <template slot-scope="scope">
+                            <input type="text" v-model="scope.row.sort" class="sort">
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            imageUrl:'',
+            skuId:'',
+            noimg:require("../../assets/timg.jpg"),
+            advertise:[]
+        }
+    },
+    created(){
+        this.getAdvertiselist()
+    },
+    methods:{
+        getAdvertiselist(){
+            const url = this.$host + `/www/yoga/admin/advert`;
+            //console.log(url)
+            this.axios.get(url).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    // this.$message({
+                    //     message: '恭喜你，这是一条成功消息',
+                    //     type: 'success'
+                    // });
+                    this.advertise=resData
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        handleAvatarSuccess1(file) {
+            this.imageUrl = file.dest;
+            this.updataImg()
+            //console.log(this.imageUrl)
+        },
+        upimg(val){
+            //console.log(val)
+            this.skuId=val
+        },
+        updataImg(){
+            var data={
+                "advert_id":this.skuId,
+                "advert_cover":this.imageUrl
+            }
+            //console.log(data)
+            const url=this.$host + `/www/yoga/admin/advert/edit_advert`;
+            this.axios.post(url,data).then(res=>{
+                //console.log(res.data)
+                this.$message({
+                        message: '上传成功！',
+                        type: 'success'
+                    });
+                this.getAdvertiselist()
+            }).catch(error=>{
+                console.log(error);
+            })
+        },
+    }
+}
+</script>
+<style lang="scss">
+.advertise{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                span{
+                    margin-left: 20px;
+                    font-size: 14px;
+                    color: #E51C23;
+
+                }
+            }
+        }
+        .imgbox{
+            width: 138px;
+            height: 80px;
+        }
+    }
+}
+</style>

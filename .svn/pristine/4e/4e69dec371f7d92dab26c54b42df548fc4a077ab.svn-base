@@ -1,0 +1,201 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+
+const login=()=>import('@/components/login')
+const index=()=>import('@/components/index')
+const myhead=()=>import('@/components/header')
+const editor=()=>import('@/components/editor')
+import evaluaStar from '@/components/evaluaStar'
+
+const data=()=>import('@/pages/dataManagement/data')
+
+const sliderImg=()=>import('@/pages/platmentManagement/sliderImg')
+const city=()=>import('@/pages/platmentManagement/city')
+const classification=()=>import('@/pages/platmentManagement/classification')
+const advertise=()=>import('@/pages/platmentManagement/advertise')
+const aboutyoga=()=>import('@/pages/platmentManagement/aboutyoga')
+
+const userinfo=()=>import('@/pages/userManagement/userinfo')
+
+const teacheraudit=()=>import('@/pages/teacherManagement/teacheraudit')
+const yogaaudit=()=>import('@/pages/teacherManagement/yogaaudit')
+const teacher=()=>import('@/pages/teacherManagement/teacher')
+const yoga=()=>import('@/pages/teacherManagement/yoga')
+const userlist=()=>import('@/pages/teacherManagement/userlist')
+const selforder=()=>import('@/pages/teacherManagement/selforder')
+const selfcoure=()=>import('@/pages/teacherManagement/selfcoure')
+const studentsorder=()=>import('@/pages/teacherManagement/studentsorder')
+
+const courelist=()=>import('@/pages/coureManagement/courelist')
+const addcoure=()=>import('@/pages/coureManagement/addcoure')
+const settime=()=>import('@/pages/coureManagement/settime')
+
+const distribution=()=>import('@/pages/distributionManagement/distribution')
+const commission=()=>import('@/pages/distributionManagement/commission')
+
+const withdrawal=()=>import('@/pages/withdrawalManagement/withdrawal')
+const setwithdrawal=()=>import('@/pages/withdrawalManagement/setwithdrawal')
+
+const order=()=>import('@/pages/orderManagement/order')
+const evaluation=()=>import('@/pages/orderManagement/evaluation')
+
+const accountlist=()=>import('@/pages/systemManagement/accountlist')
+const addacount=()=>import('@/pages/systemManagement/addacount')
+const serve=()=>import('@/pages/systemManagement/serve')
+
+
+Vue.use(Router)
+Vue.component('editor',editor)
+Vue.component('myheader',myhead)
+Vue.component('evaluaStar',evaluaStar)
+export default new Router({
+  routes: [
+    {
+      path: '/login',
+      name: 'login',
+      component: login
+    },
+    {
+      path: '/',
+      name: 'index',
+      component: index,
+      children:[
+        {
+          path: 'data',
+          name: 'data',
+          component: data,
+        },
+        {
+          path: 'sliderImg',
+          name: 'sliderImg',
+          component: sliderImg,
+        },
+        {
+          path: 'city',
+          name: 'city',
+          component: city,
+        },
+        {
+          path: 'classification',
+          name: 'classification',
+          component: classification,
+        },
+        {
+          path: 'advertise',
+          name: 'advertise',
+          component: advertise,
+        },
+        {
+          path: 'aboutyoga',
+          name: 'aboutyoga',
+          component: aboutyoga,
+        },
+        {
+          path: 'userinfo',
+          name: 'userinfo',
+          component: userinfo,
+        },
+        {
+          path: 'teacheraudit',
+          name: 'teacheraudit',
+          component: teacheraudit,
+        },
+        {
+          path: 'yogaaudit',
+          name: 'yogaaudit',
+          component: yogaaudit,
+        },
+        {
+          path: 'teacher',
+          name: 'teacher',
+          component: teacher,
+        },
+        {
+          path: 'yoga',
+          name: 'yoga',
+          component: yoga,
+        },
+        {
+          path: 'userlist',
+          name: 'userlist',
+          component: userlist,
+        },
+        {
+          path: 'studentsorder',
+          name: 'studentsorder',
+          component: studentsorder,
+        },
+        {
+          path: 'selforder',
+          name: 'selforder',
+          component: selforder,
+        },
+        {
+          path: 'selfcoure',
+          name: 'selfcoure',
+          component: selfcoure,
+        },
+        {
+          path: 'courelist',
+          name: 'courelist',
+          component: courelist,
+        },
+        {
+          path: 'addcoure',
+          name: 'addcoure',
+          component: addcoure,
+        },
+        {
+          path: 'settime',
+          name: 'settime',
+          component: settime,
+        },
+        {
+          path: 'distribution',
+          name: 'distribution',
+          component: distribution,
+        },
+        {
+          path: 'commission',
+          name: 'commission',
+          component: commission,
+        },
+        {
+          path: 'withdrawal',
+          name: 'withdrawal',
+          component: withdrawal,
+        },
+        {
+          path: 'setwithdrawal',
+          name: 'setwithdrawal',
+          component: setwithdrawal,
+        },
+        {
+          path: 'order',
+          name: 'order',
+          component: order,
+        },
+        {
+          path: 'evaluation',
+          name: 'evaluation',
+          component: evaluation,
+        },
+        {
+          path: 'accountlist',
+          name: 'accountlist',
+          component: accountlist,
+        },
+        {
+          path: 'addacount',
+          name: 'addacount',
+          component: addacount,
+        },
+        {
+          path: 'serve',
+          name: 'serve',
+          component: serve,
+        },
+      ]
+    }
+  ]
+})

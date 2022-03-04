@@ -1,0 +1,176 @@
+<template>
+    <div class="selfcoure">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <img :src="userinfo.user_portrait" alt="">
+                    <p class="fs-18">{{userinfo.user_nickname}}</p>
+                    <div class="center-col" style="margin-left:20px">
+                        <p>类型：</p>
+                        <el-select v-model="value" placeholder="请选择" @change="select">
+                            <el-option key="" label="全部" value="">
+                            </el-option>
+                            <el-option v-for="item in options" :key="item.id" :label="item.cate_name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+                <div class="right">
+                    <el-input placeholder=" 请输入课程名称" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div>
+            </div>
+            <div class="list">
+                <el-table :data="courelist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="80" label="序号">
+                    </el-table-column>
+                    <el-table-column label="封面" width="120">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.course_cover[0]" alt="" class="sq">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="course_name" label="名称">
+                    </el-table-column>
+                    <el-table-column prop="kinds" label="类型" width="130">
+                        <template slot-scope="scope">
+                            <p v-for="(item,index) in scope.row.course_types" :key="index">{{item.cate_name}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="course_number" label="课时" width="120">
+                    </el-table-column>
+                    <el-table-column prop="course_level" label="难度"  width="120">
+                    </el-table-column>
+                    <el-table-column prop="unit_price" label="单价" width="120">
+                    </el-table-column>
+                    <el-table-column prop="total_price" label="总价" width="120">
+                    </el-table-column>
+                    
+                    <el-table-column prop="created_at" label="添加时间" width="180">
+                    </el-table-column>
+                    <el-table-column label="操作" width="120" >
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="ban(scope.row.course_id,2)" v-if="scope.row.is_set==0">取消推荐</div>
+                            <div class="btn active" @click="ban(scope.row.course_id,1)" v-else>推荐到首页</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            options: [],
+            userinfo:{},
+            cove:require("../../assets/logo.png"),
+            teachername:'xxx',
+            value: '',
+            id:'',
+            courelist:[{course_cover:[]}],
+        }
+    },
+    created(){
+        this.id=this.$route.query.id
+        this.getteachercoure(1)
+        this.gettypes()
+    },
+    methods:{
+        gettypes(){
+           const url = this.$host + `admin/cate/second_cate`;
+            //console.log(url)
+            this.axios.get(url).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.options=resData.goods_cate
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            }) 
+        },
+        getteachercoure(page){
+            const url = this.$host + `admin/service_personnel/publish_course`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    course_instructor_id:this.id,
+                    course_name:this.input,
+                    sid:this.value
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.courelist=resData.result
+                    this.total_page=resData.total_number
+                    this.userinfo=resData.uesr_info
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        select(){
+            this.getteachercoure(1)
+        },
+        ban(id,i){
+            var data = {
+                course_id:id,
+                mtype:i,
+            }
+            const url=this.$host + `admin/service_personnel/recommend_home`
+            this.axios.post(url,data).then(res=>{
+                  console.log(res)
+                  var resData=res.data
+                  if(resData.code==1){
+                      this.$message({
+                        message:resData.msg,
+                        type: 'success'
+                    });
+                  }
+                  this.getteachercoure(1)
+                }).catch(error=>{
+                    console.log(error);
+             })
+        },
+        serch(){
+            this.getteachercoure(1)
+        },
+        handleCurrentChange(val) {
+            this.getteachercoure(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.selfcoure{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                img{
+                    width: 48px;
+                    height: 48px;
+                    border-radius:50%;
+                    margin-right: 20px;
+                }
+            }
+            
+        }
+    }
+}
+</style>

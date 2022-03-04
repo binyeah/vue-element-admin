@@ -1,0 +1,305 @@
+<template>
+  <div class="index">
+    <el-container style="height: 100%; ">
+      <el-aside width="220px" height="100%" style="background-color: #2b333e">
+        <div class="titles">Stay Yoga</div>
+        <el-menu style="background-color: #2b333e;padding:0 10px" text-color="#fff" :collapse="collapse" :unique-opened="true" active-text-color="#5a98de" :default-active="onRoutes" router v-for="(item,index) in list" :key="index">
+
+          <el-submenu :index="item.url" v-if="item.son">
+            <template slot="title"><i class="el-icon-s-platform"></i>{{item.title}}</template>
+            <el-menu-item-group v-for="(items,indexs) in item.son" :key="indexs">
+                <el-menu-item :index="items.url">{{items.title}}</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+          <el-menu-item :index="item.url" v-else>
+            <i class="el-icon-s-platform"></i>
+            <span slot="title">{{item.title}}</span>
+          </el-menu-item>
+
+          <!-- <el-menu-item index="data" >
+            <i class="el-icon-s-platform"></i>
+            <span slot="title">数据管理</span>
+          </el-menu-item>
+          <el-submenu index="1">
+            <template slot="title"><i class="el-icon-s-platform"></i>平台管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="sliderImg">轮播图管理</el-menu-item>
+                <el-menu-item index="city">城市管理</el-menu-item>
+                <el-menu-item index="classification">分类管理</el-menu-item>
+                <el-menu-item index="advertise">广告位管理</el-menu-item>
+                <el-menu-item index="aboutyoga">关于stay yoga</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="2">
+            <template slot="title"><i class="el-icon-s-platform"></i>用户管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="userinfo">用户信息</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="3">
+            <template slot="title"><i class="el-icon-s-platform"></i>服务人员管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="teacheraudit">教练审核</el-menu-item>
+                <el-menu-item index="yogaaudit">瑜伽馆审核</el-menu-item>
+                <el-menu-item index="teacher">教练管理</el-menu-item>
+                <el-menu-item index="yoga">瑜伽馆管理</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="4">
+            <template slot="title"><i class="el-icon-s-platform"></i>课程管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="courelist">课程列表</el-menu-item>
+                <el-menu-item index="settime">设置时间</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="5">
+            <template slot="title"><i class="el-icon-s-platform"></i>分销管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="distribution">分销管理</el-menu-item>
+                <el-menu-item index="commission">设置佣金</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="6">
+            <template slot="title"><i class="el-icon-s-platform"></i>提现管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="withdrawal">提现管理</el-menu-item>
+                <el-menu-item index="setwithdrawal">提现设置</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="7">
+            <template slot="title"><i class="el-icon-s-platform"></i>订单管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="order">订单列表</el-menu-item>
+                <el-menu-item index="evaluation">评价管理</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="8">
+            <template slot="title"><i class="el-icon-s-platform"></i>系统管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="accountlist">账号列表</el-menu-item>
+                <el-menu-item index="serve">联系客服</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu> -->
+
+        </el-menu>
+      </el-aside>
+      
+      <el-container class="view">
+        <el-header>
+            <myheader></myheader>
+        </el-header>
+        
+        <el-main>
+            <router-view></router-view>
+        </el-main>
+        
+      </el-container>
+    </el-container>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      AuthMods:[],
+      collapse: false,
+      list: [
+        {
+          title:'数据管理',
+          url:'data'
+        },
+        {
+          title:'平台管理',
+          url:'1',
+          son:[
+            {
+              title:'轮播图管理',
+              url:'sliderImg'
+            },
+            {
+              title:'城市管理',
+              url:'city'
+            },
+            {
+              title:'分类管理',
+              url:'classification'
+            },
+            {
+              title:'广告位管理',
+              url:'advertise'
+            },
+            {
+              title:'关于stay yoga',
+              url:'aboutyoga'
+            },
+          ]
+        },
+        {
+          title:'用户管理',
+          url:'2',
+          son:[
+            {
+              title:'用户信息',
+              url:'userinfo'
+            },
+          ]
+        },
+        {
+          title:'服务人员管理',
+          url:'3',
+          son:[
+            {
+              title:'教练审核',
+              url:'teacheraudit'
+            },
+            {
+              title:'瑜伽馆审核',
+              url:'yogaaudit'
+            },
+            {
+              title:'教练管理',
+              url:'teacher'
+            },
+            {
+              title:'瑜伽馆管理',
+              url:'yoga'
+            },
+          ]
+        },
+        {
+          title:'课程管理',
+          url:'4',
+          son:[
+            {
+              title:'课程列表',
+              url:'courelist'
+            },
+            {
+              title:'设置时间',
+              url:'settime'
+            },
+            
+          ]
+        },
+        {
+          title:'分销管理',
+          url:'5',
+          son:[
+            {
+              title:'分销管理',
+              url:'distribution'
+            },
+            {
+              title:'设置佣金',
+              url:'commission'
+            },
+            
+          ]
+        },
+        {
+          title:'提现管理',
+          url:'6',
+          son:[
+            {
+              title:'提现管理',
+              url:'withdrawal'
+            },
+            {
+              title:'提现设置',
+              url:'setwithdrawal'
+            },
+            
+          ]
+        },
+        {
+          title:'订单管理',
+          url:'7',
+          son:[
+            {
+              title:'订单列表',
+              url:'order'
+            },
+            {
+              title:'评价管理',
+              url:'evaluation'
+            },
+            
+          ]
+        },
+        {
+          title:'系统管理',
+          url:'8',
+          son:[
+            {
+              title:'账号列表',
+              url:'accountlist'
+            },
+            {
+              title:'联系客服',
+              url:'serve'
+            },
+            
+          ]
+        },
+      ]
+    };
+  },
+
+  created(){
+     this.getuserright()    
+  },
+  computed:{
+      onRoutes(){
+          return this.$route.path.replace('/','');
+      }
+  },
+  methods:{
+    getuserright(){
+      const url=this.$host + `admin/get_auth_mods`
+           
+      this.axios.get(url).then(res=>{
+          //console.log(res.data)
+          this.AuthMods=res.data
+        }).catch(error=>{
+            console.log(error);
+      })
+    }
+    
+  }
+};
+</script>
+<style lang="scss">
+.index{
+  .titles{
+      text-align: center;
+      font-weight: bold;
+      line-height: 60px;
+      color: #fff
+    }
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  .el-menu{
+    border: none;
+    // padding: 0 10px;
+    box-sizing: border-box;
+    background-color: #2b333e;
+    .el-menu li{ 
+      background-color: #2b333e;
+    }
+    
+  }
+}
+.el-main{
+  background-color: #f5f5f5
+}
+</style>
+
+

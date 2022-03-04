@@ -1,0 +1,292 @@
+<template>
+  <div class="index">
+    <el-container style="height: 100%; ">
+      <el-aside width="220px" height="100%" style="background-color: #2b333e">
+        <div class="titles">Stay Yoga</div>
+        <el-menu style="background-color: #2b333e;padding:0 10px" text-color="#fff" :collapse="collapse" active-text-color="#5a98de" router>
+
+          <el-menu-item index="data">
+            <i class="el-icon-s-platform"></i>
+            <span slot="title">数据管理</span>
+          </el-menu-item>
+          <el-submenu index="1">
+            <template slot="title"><i class="el-icon-s-platform"></i>平台管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="sliderImg">轮播图管理</el-menu-item>
+                <el-menu-item index="city">城市管理</el-menu-item>
+                <el-menu-item index="classification">分类管理</el-menu-item>
+                <el-menu-item index="advertise">广告位管理</el-menu-item>
+                <el-menu-item index="aboutyoga">关于stay yoga</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="2">
+            <template slot="title"><i class="el-icon-s-platform"></i>用户管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="userinfo">用户信息</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="3">
+            <template slot="title"><i class="el-icon-s-platform"></i>服务人员管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="teacheraudit">教练审核</el-menu-item>
+                <el-menu-item index="yogaaudit">瑜伽馆审核</el-menu-item>
+                <el-menu-item index="teacher">教练管理</el-menu-item>
+                <el-menu-item index="yoga">瑜伽馆管理</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="4">
+            <template slot="title"><i class="el-icon-s-platform"></i>课程管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="courelist">课程列表</el-menu-item>
+                <el-menu-item index="settime">设置时间</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="5">
+            <template slot="title"><i class="el-icon-s-platform"></i>分销管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="distribution">分销管理</el-menu-item>
+                <el-menu-item index="commission">设置佣金</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="6">
+            <template slot="title"><i class="el-icon-s-platform"></i>提现管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="withdrawal">提现管理</el-menu-item>
+                <el-menu-item index="setwithdrawal">提现设置</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="7">
+            <template slot="title"><i class="el-icon-s-platform"></i>订单管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="order">订单列表</el-menu-item>
+                <el-menu-item index="evaluation">评价管理</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="8">
+            <template slot="title"><i class="el-icon-s-platform"></i>系统管理</template>
+            <el-menu-item-group>
+                <el-menu-item index="accountlist">账号列表</el-menu-item>
+                <el-menu-item index="serve">联系客服</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+        </el-menu>
+      </el-aside>
+      
+      <el-container class="view">
+        <el-header>
+            <myheader></myheader>
+        </el-header>
+        
+        <el-main>
+            <router-view></router-view>
+        </el-main>
+        
+      </el-container>
+    </el-container>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      AuthMods:[],
+      collapse: false,
+      list: [
+        {
+          title:"数据管理",
+          sons:[
+            {
+              link: 'mallData',
+              title: '商城数据',
+            },
+            {
+              link: 'musicData',
+              title: '音乐数据',
+            },
+          ]
+        },
+        {
+          title:"平台管理",
+          sons:[
+            {
+              link: 'advertisImg',
+              title: '广告图管理',
+            },
+            {
+              link: 'article',
+              title: '文章管理',
+            },
+             {
+              link: 'headlines',
+              title: '头条管理',
+            },
+          ]
+        },
+        {
+          title:"商品管理",
+          sons:[
+            {
+              link: 'musicList',
+              title: '音乐商品列表',
+            },
+            {
+              link: 'musicCard',
+              title: '音乐卡管理',
+            },
+            {
+              link: 'goodsList',
+              title: '商品分类',
+            },
+            {
+              link: 'property',
+              title: '属性管理',
+            },
+            {
+              link: 'brand',
+              title: '品牌管理',
+            },
+            {
+              link: 'inventory',
+              title: '库存管理',
+            },
+            {
+              link: 'comments',
+              title: '评论管理',
+            },
+           
+          ]
+        },
+        {
+          title:"活动管理",
+          sons:[
+            {
+              link: 'coupons',
+              title: '优惠券',
+            },
+            {
+              link: 'LuckyDraw',
+              title: '分享抽奖',
+            },
+          ]
+        },
+        {
+          title:"订单管理",
+          sons:[
+            {
+              link: 'goodsOrder',
+              title: '商品订单',
+            },
+            {
+              link: 'musicCardOrder',
+              title: '音乐卡订单',
+            },
+            {
+              link: 'afterSellOrder',
+              title: '售后订单',
+            },
+          ]
+        },
+        {
+          title:"会员管理",
+          sons:[
+            {
+              link: 'mallVIP',
+              title: '商城会员',
+            },
+            {
+              link: 'musicVIP',
+              title: '音乐会员',
+            },
+          ]
+        },
+        {
+          title:"分销管理",
+          sons:[
+            {
+              link: 'memberEarning',
+              title: '会员收益',
+            },
+            {
+              link: 'memberStructure',
+              title: '会员结构',
+            },
+          ]
+        },
+        {
+          title:"供应商管理",
+          sons:[
+            {
+              link: 'supplierList',
+              title: '供应商列表',
+            },
+            {
+              link: 'supplierSettlement',
+              title: '供应商结算',
+            },
+          ]
+        },
+        {
+          link:'accountList',
+          title:'账号管理'
+        },
+         {
+          link:'suplierOrder',
+          title:'订单管理'
+        },
+         {
+          link:'settlement',
+          title:'结算管理'
+        },
+        {
+          link:'Goods',
+          title:'商品管理'
+        }           
+      ]
+    };
+  },
+  created(){
+           
+        },
+  
+  methods:{
+   
+    
+  }
+};
+</script>
+<style lang="scss">
+.index{
+  .titles{
+      text-align: center;
+      font-weight: bold;
+      line-height: 60px;
+      color: #fff
+    }
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  .el-menu{
+    border: none;
+    // padding: 0 10px;
+    box-sizing: border-box;
+    background-color: #2b333e;
+    .el-menu li{ 
+      background-color: #2b333e;
+    }
+    
+  }
+}
+.el-main{
+  background-color: #f5f5f5
+}
+</style>
+
+

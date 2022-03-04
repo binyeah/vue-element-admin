@@ -1,0 +1,157 @@
+<template>
+    <div class="studentsorder">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <img :src="userinfo.user_portrait" alt="">
+                    <p class="fs-18">{{userinfo.user_nickname}}</p>
+                    <!-- <div class="center-col" style="margin-left:20px">
+                        <p>级别：</p>
+                        <el-select v-model="value" placeholder="请选择">
+                            <el-option key="" label="全部" value="">
+                            </el-option>
+                            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div> -->
+                </div>
+                <!-- <div class="right">
+                    <el-input placeholder=" 请输入订单号" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div> -->
+            </div>
+            <div class="list">
+                <el-table :data="userlist" stripe border style="width: 100%">
+                   <el-table-column prop="order_sn" label="订单号" width="120">
+                    </el-table-column>
+                    <el-table-column label="订单内容">
+                        <template slot-scope="scope">
+                            <div class="center-col">
+                                <img :src="scope.row.course_cover" alt="" class="sq">
+                                <p>{{scope.row.course_name}}</p>
+                            </div>
+                            
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="course_number" label="课时" >
+                    </el-table-column>
+                    <el-table-column prop="course_level" label="难度">
+                    </el-table-column>
+                    
+                    <el-table-column label="类型" width="120">
+                        <template slot-scope="scope">
+                            <p v-for="(item,index) in scope.row.course_types" :key="index">{{item.cate_name}}</p>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="unit_price" label="单价">
+                    </el-table-column>
+                    <el-table-column prop="total_price" label="总价" >
+                    </el-table-column>
+                    <el-table-column prop="order_amount" label="实际支付金额" >
+                    </el-table-column>
+                    <el-table-column prop="add_time" label="下单时间" width="180">
+                    </el-table-column>
+                    <el-table-column label="状态" width="120">
+                        <template slot-scope="scope">
+                            <p>{{scope.row.order_status==1?"待支付":(scope.row.order_status==2?'已支付':(scope.row.order_status==3?'进行中':(scope.row.order_status==4?'已完成':(scope.row.order_status==5?'已取消':'教练已拒绝'))))}}</p>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            options: [
+                {
+                value: '1',
+                label: '初级'
+                }, 
+                {
+                value: '2',
+                label: '中级'
+                }, 
+                {
+                value: '3',
+                label: '高级'
+                }, 
+                
+            ],
+            userinfo:{},
+            cove:require("../../assets/logo.png"),
+            teachername:'xxx',
+            value: '',
+            id:'',
+            userlist:[],
+        }
+    },
+    created(){
+        this.id=this.$route.query.id
+        this.getteacherstudentslist(1)
+    },
+    methods:{
+        getteacherstudentslist(page){
+            const url = this.$host + `admin/service_personnel/student_order`;
+            //console.log(url)
+            this.axios.get(url,{
+               params:{
+                    pageSize:10,
+                    page:page,
+                    student_id:this.id,
+                }
+              }).then(res=>{
+                console.log(res);
+                if(res.status == 200){
+                    let resData = res.data;
+                    this.userlist=resData.result
+                    this.total_page=resData.total_number
+                    this.userinfo=resData.user_info
+                }else{
+                    this.$message.error('网络错误！请稍后重试！');
+                }
+            })
+        },
+        ban(i){
+            
+        },
+        serch(){
+
+        },
+        handleCurrentChange(val) {
+           this.getteacherstudentslist(val)
+        },
+    }
+}
+</script>
+<style lang="scss">
+.studentsorder{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                img{
+                    width: 48px;
+                    height: 48px;
+                    border-radius:50%;
+                    margin-right: 20px;
+                }
+            }
+            
+        }
+    }
+}
+</style>

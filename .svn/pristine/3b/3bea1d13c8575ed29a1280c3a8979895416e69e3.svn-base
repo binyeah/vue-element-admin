@@ -1,0 +1,164 @@
+<template>
+    <div class="selfcoure">
+        <div class="content bg-f padding-24">
+            <div class="top space-between">
+                <div class="center-col left">
+                    <img :src="cove" alt="">
+                    <p class="fs-18">{{teachername}}</p>
+                    <div class="center-col" style="margin-left:20px">
+                        <p>类型：</p>
+                        <el-select v-model="value" placeholder="请选择">
+                            <el-option key="" label="全部" value="">
+                            </el-option>
+                            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+                <div class="right">
+                    <el-input placeholder=" 请输入课程名称" v-model="input"  style="width:250px">
+                        <el-button slot="append" icon="el-icon-search" @click="serch()"></el-button>
+                    </el-input>
+                </div>
+            </div>
+            <div class="list">
+                <el-table :data="courelist" stripe border style="width: 100%">
+                    <el-table-column type="index" width="80" label="序号">
+                    </el-table-column>
+                    <el-table-column label="封面" width="120">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.img" alt="" class="sq">
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="name" label="名称">
+                    </el-table-column>
+                    <el-table-column prop="kinds" label="类型" width="130">
+                    </el-table-column>
+                    <el-table-column prop="couretime" label="课时" width="120">
+                    </el-table-column>
+                    <el-table-column prop="differ" label="难度"  width="120">
+                    </el-table-column>
+                    <el-table-column prop="singerprice" label="单价" width="120">
+                    </el-table-column>
+                    <el-table-column prop="totalprice" label="总价" width="120">
+                    </el-table-column>
+                    
+                    <el-table-column prop="addtime" label="添加时间" width="180">
+                    </el-table-column>
+                    <el-table-column label="操作" width="120" >
+                        <template slot-scope="scope">
+                            <div class="btn del" @click="ban(scope.row.id)" v-if="scope.row.ban==true">取消推荐</div>
+                            <div class="btn active" @click="ban(scope.row.id)" v-else>推荐到首页</div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :page-size="10"
+                layout="total, prev, pager, next"
+                :total="total_page">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            input:'',
+            total_page:1,
+            options: [
+                {
+                value: '选项1',
+                label: '黄金糕'
+                }, 
+                {
+                value: '选项2',
+                label: '双皮奶'
+                }, 
+                {
+                value: '选项3',
+                label: '蚵仔煎'
+                }, 
+                {
+                value: '选项4',
+                label: '龙须面'
+                }, 
+                {
+                value: '选项5',
+                label: '北京烤鸭'
+                }
+            ],
+            cove:require("../../assets/logo.png"),
+            teachername:'xxx',
+            value: '',
+            id:'',
+            courelist:[
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    kinds:'课程类型',
+                    id:1,
+                    couretime:'10',
+                    differ:'LV5',
+                    singerprice:'199',
+                    totalprice:'2000',
+                    addtime:'2019-06-10 08:12:00',
+                    ban:true
+                },
+                {
+                    img:require("../../assets/logo.png"),
+                    name:'xx',
+                    kinds:'课程类型',
+                    id:2,
+                    couretime:'10',
+                    differ:'LV5',
+                    singerprice:'199',
+                    totalprice:'2000',
+                    addtime:'2019-06-10 08:12:00',
+                    ban:false
+                }
+            ],
+        }
+    },
+    created(){
+        this.id=this.$route.query.id
+    },
+    methods:{
+        ban(i){
+            
+        },
+        serch(){
+
+        },
+        handleSizeChange(val) {
+            // console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            //console.log(`当前页: ${val}`);
+        },
+    }
+}
+</script>
+<style lang="scss">
+.selfcoure{
+    .content{
+        height: auto;
+        .top{
+            height: 80px;
+            .left{
+                font-size: 16px;
+                img{
+                    width: 48px;
+                    height: 48px;
+                    border-radius:50%;
+                    margin-right: 20px;
+                }
+            }
+            
+        }
+    }
+}
+</style>
